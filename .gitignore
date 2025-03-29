@@ -1,3 +1,11 @@
 # Bỏ qua thư mục môi trường ảo
 venv/
 env/
+
+# Bỏ qua các tệp Word
+NoiDungTongHop.docx
+table.docx
+
+# Bỏ qua các tệp SQL
+vers1.sql
+vers2.sql
