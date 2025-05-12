@@ -29,9 +29,9 @@ def load_vietnamese_stopwords(filepath):
         stopwords = set(line.strip() for line in f if line.strip())
     return stopwords
 
+
 # Đường dẫn tới file stop words tiếng Việt
 VIETNAMESE_STOPWORDS_PATH = r'D:\HeTuVanThongTin\vietnamese-stopwords.txt'
-
 # Tải stop words tiếng Việt khi khởi động
 VIETNAMESE_STOPWORDS = load_vietnamese_stopwords(VIETNAMESE_STOPWORDS_PATH)
 
@@ -50,27 +50,27 @@ def preprocess_text(text, remove_stopwords=True, min_word_length=2):
     Returns:
         str: Văn bản đã được tiền xử lý.
     """
-    # Loại bỏ ký tự đặc biệt
+
     text = re.sub(r'[^\w\s]', '', text)
     text = text.lower()  # Chuyển về chữ thường
     
-    # Tokenize văn bản
+
     tokens = word_tokenize(text)
     
-    # Loại bỏ stop words nếu được yêu cầu
+
     if remove_stopwords:
         # Stop words tiếng Anh
         english_stopwords = set(stopwords.words('english'))
         
-        # Kết hợp stop words tiếng Anh và tiếng Việt
+        # stop words tiếng Anh và tiếng Việt
         stop_words = english_stopwords.union(VIETNAMESE_STOPWORDS)
         
         tokens = [word for word in tokens if word not in stop_words]
     
-    # Loại bỏ từ ngắn hơn min_word_length
+ 
     tokens = [word for word in tokens if len(word) >= min_word_length]
     
-    # Lemmatization (chuyển từ về dạng gốc)
+    # Lemmatization 
     lemmatizer = WordNetLemmatizer()
     tokens = [lemmatizer.lemmatize(token) for token in tokens]
     
@@ -90,7 +90,7 @@ def extract_keywords_tfidf(products, max_features=10, min_word_length=2):
     Returns:
         list: Danh sách từ khóa cho từng sản phẩm.
     """
-    # Tiền xử lý mô tả sản phẩm
+    # Tiền xử lý mô tả 
     descriptions = [preprocess_text(product['MoTa'], min_word_length=min_word_length) for product in products]
     
     # Tạo TF-IDF vectorizer
@@ -115,4 +115,3 @@ def extract_keywords_tfidf(products, max_features=10, min_word_length=2):
     return product_keywords
 
 
-#cái này chỉ lọc được keyword cho 1 từ thôi!

@@ -8,7 +8,7 @@ product_ns = Namespace('products', description='Product related operations')
 # Định nghĩa model dữ liệu cho Swagger
 product_model = product_ns.model('Product', {
     'Ten': fields.String(required=True, description='Tên sản phẩm'),
-    'Loai': fields.String(required=True, description='Loại sản phẩm'),
+    'NhanHang': fields.String(required=True, description='Nhãn hàng'),
     'MoTa': fields.String(description='Mô tả sản phẩm'),
     'Gia': fields.Float(required=True, description='Giá sản phẩm'),
     'SoLuong': fields.Integer(required=True, description='Số lượng sản phẩm'),
@@ -24,7 +24,7 @@ class ProductList(Resource):
         return [{
             'ProductID': product.ProductID,
             'Ten': product.Ten,
-            'Loai': product.Loai,
+            'NhanHang': product.NhanHang,
             'MoTa': product.MoTa,
             'Gia': float(product.Gia),
             'SoLuong': product.SoLuong,
@@ -38,7 +38,7 @@ class ProductList(Resource):
         data = product_ns.payload
         new_product = SanPham(
             Ten=data['Ten'],
-            Loai=data['Loai'],
+            NhanHang=data['NhanHang'],
             MoTa=data.get('MoTa'),
             Gia=data['Gia'],
             SoLuong=data['SoLuong'],
@@ -60,7 +60,7 @@ class Product(Resource):
         return {
             'ProductID': product.ProductID,
             'Ten': product.Ten,
-            'Loai': product.Loai,
+            'NhanHang': product.NhanHang,
             'MoTa': product.MoTa,
             'Gia': float(product.Gia),
             'SoLuong': product.SoLuong,
@@ -86,7 +86,7 @@ class Product(Resource):
             return {'message': 'Sản phẩm không tồn tại!'}, 404
         data = product_ns.payload
         product.Ten = data.get('Ten', product.Ten)
-        product.Loai = data.get('Loai', product.Loai)
+        product.NhanHang = data.get('NhanHang', product.NhanHang)
         product.MoTa = data.get('MoTa', product.MoTa)
         product.Gia = data.get('Gia', product.Gia)
         product.SoLuong = data.get('SoLuong', product.SoLuong)

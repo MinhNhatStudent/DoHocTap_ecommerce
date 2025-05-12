@@ -23,15 +23,15 @@ def save_keywords_to_db(product_keywords):
                 if keyword not in existing_keywords:
                     new_keywords.append(SanPham_TuKhoa(ProductID=product_id, TuKhoa=keyword))
         
-        # Batch insert tất cả từ khóa mới
+        # Batch insert tất cả từ mới
         if new_keywords:
             db.session.bulk_save_objects(new_keywords)
             logging.info(f"Thêm {len(new_keywords)} từ khóa mới vào cơ sở dữ liệu.")
         
-        # Commit một lần duy nhất
+        # Commit một lần
         db.session.commit()
     except Exception as e:
-        # Rollback nếu có lỗi
+
         db.session.rollback()
         logging.error(f"Lỗi khi lưu từ khóa vào cơ sở dữ liệu: {e}")
         raise e
