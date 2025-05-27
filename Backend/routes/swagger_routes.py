@@ -17,7 +17,8 @@ api = Api(
     version='1.0',
     title='HeTuVanThongTin API',
     description='API documentation for HeTuVanThongTin',
-    doc='/swagger'  # URL để truy cập Swagger UI
+    doc='/swagger',  # URL để truy cập Swagger UI
+    prefix='/api'   # Thêm prefix '/api' để tránh xung đột với các route khác
 )
 
 # Đăng ký namespace

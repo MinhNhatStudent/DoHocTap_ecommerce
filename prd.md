@@ -3,7 +3,7 @@
 
 ## 1. Tổng quát
 ## 1.1 Mục tiêu hệ thống
-Đây là một hệ thống tư vấn thông tin (information recommendation system) được thiết kế để đề xuất các sản phẩm tương tự hoặc phù hợp cho người dùng dựa trên các tương tác của họ và đặc điểm của sản phẩm. Hệ thống được xây dựng để trình bày những kiến thức về content-based filtering trong môn học hệ tư vấn thông tin. Hệ thống bao gồm cả backend xử lý logic đề xuất và frontend demo trực quan kết quả đề xuất. Hệ thống không nhắm đến việc trở thành một e-commerce website hoàn chỉnh.
+Đây là một hệ thống tư vấn thông tin (information recommendation system) được thiết kế để đề xuất các sản phẩm tương tự hoặc phù hợp cho người dùng dựa trên các tương tác của họ và đặc điểm của sản phẩm. Hệ thống được xây dựng để trình bày những kiến thức về content-based filtering trong môn học hệ tư vấn thông tin. Hệ thống bao gồm cả backend xử lý logic đề xuất và frontend demo trực quan kết quả đề xuất. Hệ thống không nhắm đến việc trở thành một e-commerce website hoàn chỉnh, nên giao diện đơn giản, dễ sử dụng và dễ code. Hệ thống e-commerce lấy chủ bán đồ dùng học tập, văn phòng phẩm và sách
 
 ## 1.2 Đối tượng sử dụng chính
 - Học sinh, sinh viên với nhu cầu trình bày đồ án những kiến thức đã học

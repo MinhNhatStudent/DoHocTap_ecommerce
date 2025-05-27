@@ -49,15 +49,42 @@ As you complete tasks and references relevant files, update this file as our mem
 
 
 ### 3.1. Thiết lập cấu trúc frontend
-- [ ] Tạo cấu trúc thư mục frontend
-- [ ] Cài đặt các dependencies cần thiết
+- [x] Tạo cấu trúc thư mục frontend
+- [x] Cài đặt các dependencies cần thiết
 
 ### 3.2. Phát triển các trang 
-- [ ] Tạo trang chủ (hiển thị danh sách sản phẩm và sản phẩm mới nhất) (sử dụng trang index.html trong FrontEnd template)
-- [ ] Tạo trang chi tiết sản phẩm (hiển thị sản phẩm chi tiết và sản phẩm liên quan) (sử dụng trang product trong FrontEnd template)
-- [ ] Tạo trang giỏ hàng (sử dụng trang blank.html trong FrontEnd template)
-- [ ] Tạo trang đăng nhập (sử dụng trang blank.html trong FrontEnd template)
-- [ ] Tạo trang đăng ký (sử dụng trang blank.html trong FrontEnd template)
+
+#### 3.2.1. Trang chủ
+- [x] Xây dựng base.html
+- [x] Chỉnh sửa template index.html để kế thừa từ base.html
+- [x] Tạo route hiển thị danh sách tất cả sản phẩm 
+- [x] Thêm phân mục sản phẩm mới nhất (sắp xếp theo ngày tạo)
+- [x] Tạo các liên kết điều hướng giữa các trang
+
+#### 3.2.2. Trang chi tiết sản phẩm
+- [ ] Chỉnh sửa product.html để kế thừa từ base.html
+- [ ] Tạo route hiển thị thông tin chi tiết của một sản phẩm theo ID
+- [ ] Hiển thị sản phẩm liên quan (sử dụng API Recommendations)
+- [ ] Tạo chức năng thêm sản phẩm vào giỏ hàng
+
+#### 3.2.3. Trang giỏ hàng
+- [ ] Chỉnh sửa cart.html để kế thừa từ base.html
+- [ ] Tạo route hiển thị giỏ hàng của người dùng
+- [ ] Tạo chức năng cập nhật số lượng sản phẩm trong giỏ hàng
+- [ ] Tạo chức năng xóa sản phẩm khỏi giỏ hàng
+- [ ] Hiển thị sản phẩm đề xuất dựa trên giỏ hàng
+
+#### 3.2.4. Trang đăng nhập
+- [ ] Tạo form đăng nhập trong dangnhap.html
+- [ ] Tạo route xử lý đăng nhập
+- [ ] Thiết lập xác thực người dùng và session
+- [ ] Xử lý lỗi đăng nhập và hiển thị thông báo
+
+#### 3.2.5. Trang đăng ký
+- [ ] Tạo form đăng ký trong dangky.html khác
+- [ ] Tạo route xử lý đăng ký
+- [ ] Kiểm tra và xác thực dữ liệu đăng ký
+- [ ] Xử lý lỗi đăng ký và hiển thị thông báo
 
 ### 3.3. Tích hợp API
 - [ ] Kết nối API Users

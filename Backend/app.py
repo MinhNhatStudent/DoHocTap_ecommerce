@@ -2,26 +2,23 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models.database import db
 from routes.swagger_routes import swagger_bp 
+from routes.view_routes import view_bp
 from sqlalchemy.sql import text
 from services.embed_service import ProductEmbedding
 
-app = Flask(__name__)
+# Khởi tạo Flask app với đường dẫn tĩnh và template
+app = Flask(__name__, 
+            static_folder='static',  # Thư mục chứa các file tĩnh (CSS, JS, hình ảnh)
+            template_folder='templates'  # Thư mục chứa các template HTML
+           )
 CORS(app)
+app.secret_key = 'hetuvan-secret-key-2023'  # Thêm secret key cho session
 
 # Cấu hình kết nối MySQL
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:@localhost/hetuvan'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
-
-@app.route('/reset-database', methods=['POST'])
-def reset_database():
-    """Xóa và tạo lại toàn bộ cơ sở dữ liệu"""
-    with app.app_context():
-        db.drop_all()  # Xóa toàn bộ bảng
-        db.create_all()  # Tạo lại bảng dựa trên mô hình
-    return {"message": "Cơ sở dữ liệu đã được reset thành công!"}, 200
-
 
 with app.app_context():
     try:
@@ -30,8 +27,11 @@ with app.app_context():
     except Exception as e:
         print(f"Lỗi kết nối cơ sở dữ liệu: {e}")
 
-# Đăng ký các blueprints
+# Đăng ký các blueprints - đăng ký view_bp trước để tránh xung đột với swagger_bp
+app.register_blueprint(view_bp)
 app.register_blueprint(swagger_bp)
+
+# Đã cấu hình đường dẫn tĩnh khi khởi tạo Flask app
 
 
 if __name__ == '__main__':
