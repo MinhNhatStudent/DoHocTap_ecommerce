@@ -16,14 +16,26 @@ def index():
     
     # Lấy danh sách sản phẩm mới nhất (giả định sản phẩm có ID cao hơn là mới hơn)
     newest_products = SanPham.query.order_by(SanPham.ProductID.desc()).limit(8).all()
-    
-    # Lấy sản phẩm phổ biến
+    # Tạm thời sử dụng trực tiếp class RecommendationService để lấy sản phẩm phổ biến
     try:
-        response = requests.get('http://localhost:5000/recommend_bp/popular')
-        popular_data = response.json()
-        popular_ids = [item['ProductID'] for item in popular_data['popular_products']]
-        popular_products = SanPham.query.filter(SanPham.ProductID.in_(popular_ids)).all()
-    except:
+        from services.recommend import RecommendationService
+        recommendation_service = RecommendationService()
+        
+        # Gọi trực tiếp phương thức của service
+        popular_data = recommendation_service.get_popular_products(8)
+        
+        if popular_data:
+            # Lấy các product từ database dựa trên ID
+            popular_ids = [item['ProductID'] for item in popular_data]
+            popular_products = SanPham.query.filter(SanPham.ProductID.in_(popular_ids)).all()
+            
+            # Sắp xếp sản phẩm theo thứ tự như trong API
+            product_dict = {product.ProductID: product for product in popular_products}
+            popular_products = [product_dict[id] for id in popular_ids if id in product_dict]
+        else:
+            popular_products = []
+    except Exception as e:
+        print(f"Error getting popular products: {e}")
         popular_products = []
         
     # Lấy sản phẩm bán chạy - dựa trên các tương tác loại cart và các đơn hàng
@@ -58,11 +70,19 @@ def index():
         print(f"Error getting bestsellers: {e}")
         bestseller_products = SanPham.query.order_by(db.func.random()).limit(8).all()
     
+    # Lấy sản phẩm theo nhãn hiệu cụ thể
+    thienlong_products = SanPham.query.filter(SanPham.NhanHang.ilike('%thiên long%')).limit(8).all()
+    copyplus_products = SanPham.query.filter(SanPham.NhanHang.ilike('%copy plus%')).limit(8).all()
+    parker_products = SanPham.query.filter(SanPham.NhanHang.ilike('%parker%')).limit(8).all()
+    
     return render_template('index.html', 
                            all_products=all_products, 
                            newest_products=newest_products,
                            popular_products=popular_products,
-                           bestseller_products=bestseller_products)
+                           bestseller_products=bestseller_products,
+                           thienlong_products=thienlong_products,
+                           copyplus_products=copyplus_products,
+                           parker_products=parker_products)
 
 @view_bp.route('/product/<int:product_id>')
 def product_detail(product_id):
@@ -235,15 +255,26 @@ def store():
     if search_query:
         products = SanPham.query.filter(SanPham.Ten.like(f'%{search_query}%')).all()
     else:
-        products = SanPham.query.all()
-    
-    # Lấy sản phẩm phổ biến
+        products = SanPham.query.all()      # Tạm thời sử dụng trực tiếp class RecommendationService để lấy sản phẩm phổ biến
     try:
-        response = requests.get('http://localhost:5000/recommend_bp/popular')
-        popular_data = response.json()
-        popular_ids = [item['ProductID'] for item in popular_data['popular_products']]
-        popular_products = SanPham.query.filter(SanPham.ProductID.in_(popular_ids)).all()
-    except:
+        from services.recommend import RecommendationService
+        recommendation_service = RecommendationService()
+        
+        # Gọi trực tiếp phương thức của service
+        popular_data = recommendation_service.get_popular_products(8)
+        
+        if popular_data:
+            # Lấy các product từ database dựa trên ID
+            popular_ids = [item['ProductID'] for item in popular_data]
+            popular_products = SanPham.query.filter(SanPham.ProductID.in_(popular_ids)).all()
+            
+            # Sắp xếp sản phẩm theo thứ tự như trong API
+            product_dict = {product.ProductID: product for product in popular_products}
+            popular_products = [product_dict[id] for id in popular_ids if id in product_dict]
+        else:
+            popular_products = SanPham.query.order_by(db.func.random()).limit(4).all()
+    except Exception as e:
+        print(f"Error getting popular products: {e}")
         popular_products = SanPham.query.order_by(db.func.random()).limit(4).all()
     
     return render_template('store.html', products=products, popular_products=popular_products)

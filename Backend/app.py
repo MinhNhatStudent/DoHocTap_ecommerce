@@ -3,6 +3,7 @@ from flask_cors import CORS
 from models.database import db
 from routes.swagger_routes import swagger_bp 
 from routes.view_routes import view_bp
+from routes.recommend_routes import recommend_bp
 from sqlalchemy.sql import text
 from services.embed_service import ProductEmbedding
 
@@ -30,6 +31,7 @@ with app.app_context():
 # Đăng ký các blueprints - đăng ký view_bp trước để tránh xung đột với swagger_bp
 app.register_blueprint(view_bp)
 app.register_blueprint(swagger_bp)
+app.register_blueprint(recommend_bp, url_prefix='/recommend_bp')
 
 # Đã cấu hình đường dẫn tĩnh khi khởi tạo Flask app
 

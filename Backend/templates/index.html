@@ -57,6 +57,67 @@
 </div>
 <!-- /SECTION -->
 
+<!-- SECTION: SẢN PHẨM PHỔ BIẾN NHẤT -->
+<div class="section" style="background-color: #f8f8f8; padding-top: 40px; padding-bottom: 60px; margin-top: 20px;">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+            <!-- section title -->
+            <div class="col-md-12">
+                <div class="section-title text-center" style="margin-bottom: 40px;">
+                    <h2 class="title" style="color: #D10024; font-size: 32px; text-transform: uppercase; font-weight: 700;">Sản Phẩm Phổ Biến Nhất</h2>
+                    <p style="font-size: 16px; margin-top: 15px;">Những sản phẩm được yêu thích và tìm kiếm nhiều nhất</p>
+                </div>
+            </div>
+            <!-- /section title -->
+        </div>
+        
+        <!-- Products grid -->
+        <div class="row">
+            {% for product in popular_products %}
+            <div class="col-md-3 col-xs-6">
+                <div class="product" style="background-color: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); padding: 15px; margin-bottom: 30px; transition: all 0.3s;">
+                    <div class="product-img">
+                        <img src="{{ product.HinhAnh }}" alt="{{ product.Ten }}" style="max-height: 200px; margin: 0 auto;">
+                        <div class="product-label">
+                            <span class="new" style="background-color: #FF9800;">TOP</span>
+                        </div>
+                        <div class="product-body">
+                            <h3 class="product-name" style="height: 40px; overflow: hidden;"><a href="{{ url_for('view_bp.product_detail', product_id=product.ProductID) }}">{{ product.Ten }}</a></h3>
+                            <h4 class="product-price" style="color: #D10024; font-size: 18px; font-weight: 700;">{{ "{:,.0f}".format(product.Gia) }} đ</h4>
+                            <div class="product-rating">
+                                <i class="fa fa-star" style="color: gold;"></i>
+                                <i class="fa fa-star" style="color: gold;"></i>
+                                <i class="fa fa-star" style="color: gold;"></i>
+                                <i class="fa fa-star" style="color: gold;"></i>
+                                <i class="fa fa-star" style="color: gold;"></i>
+                            </div>
+                            <div class="product-btns">
+                                <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">Yêu thích</span></button>
+                                <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">Xem nhanh</span></button>
+                            </div>
+                        </div>
+                        <div class="add-to-cart">
+                            <button class="add-to-cart-btn" onclick="addToCart({{ product.ProductID }})" style="background-color: #D10024; border-radius: 40px;"><i class="fa fa-shopping-cart"></i> Thêm vào giỏ</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- /Products grid -->
+        
+        <div class="row">
+            <div class="col-md-12 text-center" style="margin-top: 30px;">
+                <a href="{{ url_for('view_bp.store') }}" class="primary-btn cta-btn" style="background-color: #D10024; padding: 12px 30px; border-radius: 40px; font-size: 16px;">Xem thêm sản phẩm</a>
+            </div>
+        </div>
+    </div>
+    <!-- /container -->
+</div>
+<!-- /SECTION: SẢN PHẨM PHỔ BIẾN NHẤT -->
+
 <!-- SECTION -->
 <div class="section">
     <!-- container -->
@@ -330,10 +391,9 @@
     <!-- container -->
     <div class="container">
         <!-- row -->
-        <div class="row">
-            <div class="col-md-4 col-xs-6">
+        <div class="row">            <div class="col-md-4 col-xs-6">
                 <div class="section-title">
-                    <h4 class="title">Sách giảm giá</h4>
+                    <h4 class="title">Thiên Long</h4>
                     <div class="section-nav">
                         <div id="slick-nav-3" class="products-slick-nav"></div>
                     </div>
@@ -341,7 +401,7 @@
 
                 <div class="products-widget-slick" data-nav="#slick-nav-3">
                     <div>
-                        {% for product in all_products[:3] %}
+                        {% for product in thienlong_products[:3] %}
                         <!-- product widget -->
                         <div class="product-widget">
                             <div class="product-img">
@@ -350,6 +410,9 @@
                             <div class="product-body">
                                 <h3 class="product-name"><a href="{{ url_for('view_bp.product_detail', product_id=product.ProductID) }}">{{ product.Ten }}</a></h3>
                                 <h4 class="product-price">{{ "{:,.0f}".format(product.Gia) }} đ</h4>
+                                <div class="product-category">
+                                    <span>Văn phòng phẩm</span>
+                                </div>
                             </div>
                         </div>
                         <!-- /product widget -->
@@ -360,7 +423,7 @@
 
             <div class="col-md-4 col-xs-6">
                 <div class="section-title">
-                    <h4 class="title">Văn phòng phẩm</h4>
+                    <h4 class="title">Copy Plus</h4>
                     <div class="section-nav">
                         <div id="slick-nav-4" class="products-slick-nav"></div>
                     </div>
@@ -368,7 +431,7 @@
 
                 <div class="products-widget-slick" data-nav="#slick-nav-4">
                     <div>
-                        {% for product in all_products[3:6] %}
+                        {% for product in copyplus_products[:3] %}
                         <!-- product widget -->
                         <div class="product-widget">
                             <div class="product-img">
@@ -377,6 +440,9 @@
                             <div class="product-body">
                                 <h3 class="product-name"><a href="{{ url_for('view_bp.product_detail', product_id=product.ProductID) }}">{{ product.Ten }}</a></h3>
                                 <h4 class="product-price">{{ "{:,.0f}".format(product.Gia) }} đ</h4>
+                                <div class="product-category">
+                                    <span>Giấy in</span>
+                                </div>
                             </div>
                         </div>
                         <!-- /product widget -->
@@ -387,7 +453,7 @@
 
             <div class="col-md-4 col-xs-6">
                 <div class="section-title">
-                    <h4 class="title">Đồ dùng học tập</h4>
+                    <h4 class="title">Parker</h4>
                     <div class="section-nav">
                         <div id="slick-nav-5" class="products-slick-nav"></div>
                     </div>
@@ -395,7 +461,7 @@
 
                 <div class="products-widget-slick" data-nav="#slick-nav-5">
                     <div>
-                        {% for product in all_products[6:9] %}
+                        {% for product in parker_products[:3] %}
                         <!-- product widget -->
                         <div class="product-widget">
                             <div class="product-img">
@@ -404,6 +470,9 @@
                             <div class="product-body">
                                 <h3 class="product-name"><a href="{{ url_for('view_bp.product_detail', product_id=product.ProductID) }}">{{ product.Ten }}</a></h3>
                                 <h4 class="product-price">{{ "{:,.0f}".format(product.Gia) }} đ</h4>
+                                <div class="product-category">
+                                    <span>Bút cao cấp</span>
+                                </div>
                             </div>
                         </div>
                         <!-- /product widget -->
