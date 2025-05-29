@@ -43,7 +43,7 @@ class UserFavorites(Resource):
                     'UserID': favorite.UserID,
                     'ProductID': product.ProductID,
                     'Ten': product.Ten,
-                    'Loai': product.Loai,
+                    'NhanHang': product.NhanHang,
                     'Gia': float(product.Gia),
                     'HinhAnh': product.HinhAnh
                 })

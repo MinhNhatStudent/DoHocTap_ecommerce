@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+		<title>{% block title %}Hệ Tư Vấn Thông Tin - Cửa hàng văn phòng phẩm{% endblock %}</title>
+
+ 		<!-- Google font -->
+ 		<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
+
+ 		<!-- Bootstrap -->
+ 		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}"/>
+
+ 		<!-- Slick -->
+ 		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/slick.css') }}"/>
+ 		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/slick-theme.css') }}"/>
+
+ 		<!-- nouislider -->
+ 		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/nouislider.min.css') }}"/>
+
+ 		<!-- Font Awesome Icon -->
+ 		<link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+
+ 		<!-- Custom stlylesheet -->
+ 		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+        
+        {% block extra_css %}{% endblock %}
+    </head>
+	<body>
+		<!-- HEADER -->
+		<header>
+			<!-- TOP HEADER -->
+			<div id="top-header">
+				<div class="container">
+					<ul class="header-links pull-left">
+						<li><a href="#"><i class="fa fa-phone"></i> +084-123-456-789</a></li>
+						<li><a href="#"><i class="fa fa-envelope-o"></i> contact@hetuvan.com</a></li>
+						<li><a href="#"><i class="fa fa-map-marker"></i> Hà Nội, Việt Nam</a></li>
+					</ul>					<ul class="header-links pull-right">
+						{% if current_user.logged_in %}
+							<li><a href="#"><i class="fa fa-user"></i> Xin chào, {{ current_user.name }}</a></li>
+							<li><a href="{{ url_for('view_bp.logout') }}"><i class="fa fa-sign-out"></i> Đăng xuất</a></li>
+						{% else %}
+							<li><a href="{{ url_for('view_bp.login') }}"><i class="fa fa-user-o"></i> Đăng nhập</a></li>
+							<li><a href="{{ url_for('view_bp.register') }}"><i class="fa fa-user-plus"></i> Đăng ký</a></li>
+						{% endif %}
+					</ul>
+				</div>
+			</div>
+			<!-- /TOP HEADER -->
+
+			<!-- MAIN HEADER -->
+			<div id="header">
+				<!-- container -->
+				<div class="container">
+					<!-- row -->
+					<div class="row">
+						<!-- LOGO -->
+						<div class="col-md-3">
+							<div class="header-logo">
+								<a href="{{ url_for('view_bp.index') }}" class="logo">
+									<img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+								</a>
+							</div>
+						</div>
+						<!-- /LOGO -->						<!-- SEARCH BAR -->
+						<div class="col-md-6">
+							<div class="header-search">
+								<form action="{{ url_for('view_bp.store') }}" method="get">
+									<div style="display: flex; align-items: center;">
+										<select class="input-select" style="width: auto; height: 40px; border-radius: 40px 0 0 40px; padding-right: 15px;">
+											<option value="0">Tất cả</option>
+											<option value="1">Sách</option>
+											<option value="2">Văn phòng phẩm</option>
+											<option value="3">Đồ dùng học tập</option>
+										</select>
+										<input class="input" name="search" placeholder="Tìm kiếm tại đây" style="flex: 1; border-radius: 0; border-left: none; height: 40px;">
+										<button class="search-btn" style="height: 40px; border-radius: 0 40px 40px 0;">Tìm</button>
+									</div>
+								</form>
+							</div>
+						</div>
+						<!-- /SEARCH BAR -->
+
+						<!-- ACCOUNT -->
+						<div class="col-md-3 clearfix">
+							<div class="header-ctn">
+								<!-- Cart -->
+								<div>
+									<a href="{{ url_for('view_bp.cart') }}">
+										<i class="fa fa-shopping-cart"></i>
+										<span>Giỏ hàng</span>
+										<div class="qty" id="cart-count">0</div>
+									</a>
+								</div>
+								<!-- /Cart -->
+
+								<!-- Menu Toogle -->
+								<div class="menu-toggle">
+									<a href="#">
+										<i class="fa fa-bars"></i>
+										<span>Menu</span>
+									</a>
+								</div>
+								<!-- /Menu Toogle -->
+							</div>
+						</div>
+						<!-- /ACCOUNT -->
+					</div>
+					<!-- row -->
+				</div>
+				<!-- container -->
+			</div>
+			<!-- /MAIN HEADER -->
+		</header>
+		<!-- /HEADER -->
+
+		<!-- NAVIGATION -->
+		<nav id="navigation">
+			<!-- container -->
+			<div class="container">
+				<!-- responsive-nav -->
+				<div id="responsive-nav">
+					<!-- NAV -->
+					<ul class="main-nav nav navbar-nav">
+						<li class="active"><a href="{{ url_for('view_bp.index') }}">Trang chủ</a></li>
+						<li><a href="{{ url_for('view_bp.store') }}">Cửa hàng</a></li>
+						<li><a href="#">Sách</a></li>
+						<li><a href="#">Văn phòng phẩm</a></li>
+						<li><a href="#">Đồ dùng học tập</a></li>
+					</ul>
+					<!-- /NAV -->
+				</div>
+				<!-- /responsive-nav -->
+			</div>
+			<!-- /container -->
+		</nav>
+		<!-- /NAVIGATION -->
+
+		{% block content %}
+		{% endblock %}
+
+		<!-- NEWSLETTER -->
+		<div id="newsletter" class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+					<div class="col-md-12">
+						<div class="newsletter">
+							<p>Đăng ký để nhận <strong>THÔNG BÁO</strong> mới nhất</p>
+							<form>
+								<input class="input" type="email" placeholder="Nhập Email của bạn">
+								<button class="newsletter-btn"><i class="fa fa-envelope"></i> Đăng ký</button>
+							</form>
+							<ul class="newsletter-follow">
+								<li>
+									<a href="#"><i class="fa fa-facebook"></i></a>
+								</li>
+								<li>
+									<a href="#"><i class="fa fa-twitter"></i></a>
+								</li>
+								<li>
+									<a href="#"><i class="fa fa-instagram"></i></a>
+								</li>
+								<li>
+									<a href="#"><i class="fa fa-pinterest"></i></a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /NEWSLETTER -->
+
+		<!-- FOOTER -->
+		<footer id="footer">
+			<!-- top footer -->
+			<div class="section">
+				<!-- container -->
+				<div class="container">
+					<!-- row -->
+					<div class="row">
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">Về chúng tôi</h3>
+								<p>Hệ thống tư vấn thông tin đồ dùng học tập, văn phòng phẩm và sách dựa trên các phương pháp đề xuất hiện đại</p>
+								<ul class="footer-links">
+									<li><a href="#"><i class="fa fa-map-marker"></i>Hồ Chí Minh, Việt Nam</a></li>
+									<li><a href="#"><i class="fa fa-phone"></i>+084-123-456-789</a></li>
+									<li><a href="#"><i class="fa fa-envelope-o"></i>Contact minh nhật để hỏi 3h sáng anh ấy làm gì</a></li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">Danh mục</h3>
+								<ul class="footer-links">
+									<li><a href="#">Sản phẩm nổi bật</a></li>
+									<li><a href="#">Sách</a></li>
+									<li><a href="#">Văn phòng phẩm</a></li>
+									<li><a href="#">Đồ dùng học tập</a></li>
+									<li><a href="#">Khuyến mãi</a></li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">Thông tin</h3>
+								<ul class="footer-links">
+									<li><a href="#">Về chúng tôi</a></li>
+									<li><a href="#">Liên hệ</a></li>
+									<li><a href="#">Chính sách bảo mật</a></li>
+									<li><a href="#">Điều khoản & điều kiện</a></li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="col-md-3 col-xs-6">
+							<div class="footer">
+								<h3 class="footer-title">Dịch vụ</h3>
+								<ul class="footer-links">
+									<li><a href="#">Tài khoản</a></li>
+									<li><a href="#">Giỏ hàng</a></li>
+									<li><a href="#">Trợ giúp</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<!-- /row -->
+				</div>
+				<!-- /container -->
+			</div>
+			<!-- /top footer -->
+
+			<!-- bottom footer -->
+			<div id="bottom-footer" class="section">
+				<div class="container">
+					<!-- row -->
+					<div class="row">
+						<div class="col-md-12 text-center">
+							<span class="copyright">
+								<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+								Copyright &copy;<script>document.write(new Date().getFullYear());</script> Hệ tư vấn thông tin
+							</span>
+						</div>
+					</div>
+						<!-- /row -->
+				</div>
+				<!-- /container -->
+			</div>
+			<!-- /bottom footer -->
+		</footer>
+		<!-- /FOOTER -->
+
+		<!-- jQuery Plugins -->
+		<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/slick.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/nouislider.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/jquery.zoom.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+        {% block extra_js %}{% endblock %}
+	</body>
+</html>

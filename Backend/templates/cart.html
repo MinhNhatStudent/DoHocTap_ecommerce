@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block title %}Giỏ hàng - Hệ Tư Vấn Thông Tin{% endblock %}
+
+{% block content %}
+<!-- BREADCRUMB -->
+<div id="breadcrumb" class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="breadcrumb-tree">
+                    <li><a href="{{ url_for('view_bp.index') }}">Trang chủ</a></li>
+                    <li class="active">Giỏ hàng</li>
+                </ul>
+            </div>
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+<!-- /BREADCRUMB -->
+
+<!-- SECTION -->
+<div class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="section-title">
+                    <h3 class="title">Giỏ hàng của bạn</h3>
+                </div>
+            </div>
+        </div>
+        
+        {% if cart_items %}
+        <!-- row -->
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Cart Items -->
+                <div class="cart-list">
+                    {% for item in cart_items %}
+                    <div class="cart-item" id="cart-item-{{ item.CartID }}">
+                        <div class="row">
+                            <div class="col-md-2">                                <div class="product-img">
+                                    <img src="{{ get_image_url(item.HinhAnh) }}" alt="{{ item.Ten }}" style="width: 80px; height: 80px; object-fit: cover;">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="product-name">
+                                    <h4><a href="{{ url_for('view_bp.product_detail', product_id=item.ProductID) }}">{{ item.Ten }}</a></h4>
+                                    <p class="product-brand">{{ item.NhanHang }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="product-price">
+                                    <h4>{{ "{:,.0f}".format(item.Gia) }}đ</h4>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="product-quantity">
+                                    <div class="qty-input">
+                                        <button type="button" class="qty-btn" onclick="updateQuantity({{ item.CartID }}, -1)">-</button>
+                                        <input class="input" type="number" value="{{ item.SoLuong }}" min="1" id="qty-{{ item.CartID }}" onchange="updateQuantityInput({{ item.CartID }}, this.value)">
+                                        <button type="button" class="qty-btn" onclick="updateQuantity({{ item.CartID }}, 1)">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="product-total">
+                                    <h4 id="total-{{ item.CartID }}">{{ "{:,.0f}".format(item.Gia * item.SoLuong) }}đ</h4>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-danger btn-sm" onclick="removeFromCart({{ item.CartID }})">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- /Cart Items -->
+            </div>
+            
+            <div class="col-md-4">
+                <!-- Cart Summary -->
+                <div class="cart-summary">
+                    <div class="section-title">
+                        <h4 class="title">Tổng cộng</h4>
+                    </div>
+                    <div class="order-col">
+                        <div><strong>Tổng số tiền:</strong></div>
+                        <div><strong id="grand-total">{{ "{:,.0f}".format(total) }}đ</strong></div>
+                    </div>
+                    <div class="order-col">
+                        <div>Phí vận chuyển:</div>
+                        <div><strong>Miễn phí</strong></div>
+                    </div>
+                    <hr>
+                    <div class="order-col">
+                        <div><strong>Thành tiền:</strong></div>
+                        <div><strong class="order-total" id="final-total">{{ "{:,.0f}".format(total) }}đ</strong></div>
+                    </div>
+                    <a href="#" class="primary-btn order-submit">Thanh toán</a>
+                    <a href="{{ url_for('view_bp.store') }}" class="primary-btn">Tiếp tục mua sắm</a>
+                </div>
+                <!-- /Cart Summary -->
+            </div>
+        </div>
+        <!-- /row -->
+        {% else %}
+        <!-- Empty Cart -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="empty-cart text-center">
+                    <i class="fa fa-shopping-cart" style="font-size: 72px; color: #ccc; margin-bottom: 20px;"></i>
+                    <h3>Giỏ hàng của bạn đang trống</h3>
+                    <p>Hãy thêm một số sản phẩm vào giỏ hàng để tiếp tục mua sắm.</p>
+                    <a href="{{ url_for('view_bp.store') }}" class="primary-btn">Đi đến cửa hàng</a>
+                </div>
+            </div>
+        </div>
+        <!-- /Empty Cart -->
+        {% endif %}
+        
+        {% if recommended_products %}
+        <!-- Recommended Products -->
+        <div class="row" style="margin-top: 50px;">
+            <div class="col-md-12">
+                <div class="section-title">
+                    <h3 class="title">Sản phẩm đề xuất cho bạn</h3>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            {% for product in recommended_products %}
+            <div class="col-md-3 col-xs-6">
+                <div class="product">                    <div class="product-img">
+                        <img src="{{ get_image_url(product.HinhAnh) }}" alt="{{ product.Ten }}">
+                        <div class="product-label">
+                            <span class="new">ĐỀ XUẤT</span>
+                        </div>
+                    </div>
+                    <div class="product-body">
+                        <p class="product-category">{{ product.NhanHang }}</p>
+                        <h3 class="product-name"><a href="{{ url_for('view_bp.product_detail', product_id=product.ProductID) }}">{{ product.Ten[:50] }}{% if product.Ten|length > 50 %}...{% endif %}</a></h3>
+                        <h4 class="product-price">{{ "{:,.0f}".format(product.Gia) }}đ</h4>
+                        <div class="product-rating">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star-o"></i>
+                        </div>
+                    </div>
+                    <div class="add-to-cart">
+                        <button class="add-to-cart-btn" onclick="addToCart({{ product.ProductID }})"><i class="fa fa-shopping-cart"></i> thêm vào giỏ</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- /Recommended Products -->
+        {% endif %}
+        
+    </div>
+    <!-- /container -->
+</div>
+<!-- /SECTION -->
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.cart-item {
+    padding: 15px 0;
+}
+
+.cart-item .row {
+    align-items: center;
+}
+
+.product-img img {
+    border-radius: 5px;
+}
+
+.product-name h4 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.product-brand {
+    color: #666;
+    font-size: 14px;
+    margin: 5px 0 0 0;
+}
+
+.product-price h4, .product-total h4 {
+    margin: 0;
+    color: #1679AB;
+    font-weight: bold;
+}
+
+.qty-input {
+    display: flex;
+    align-items: center;
+    border: 1px solid #E4E7ED;
+    border-radius: 4px;
+    overflow: hidden;
+    width: 120px;
+}
+
+.qty-btn {
+    background: #f8f9fa;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    color: #666;
+    font-weight: bold;
+}
+
+.qty-btn:hover {
+    background: #e9ecef;
+}
+
+.qty-input input {
+    border: none;
+    text-align: center;
+    width: 60px;
+    padding: 8px 5px;
+    font-size: 14px;
+}
+
+.cart-summary {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #E4E7ED;
+}
+
+.order-col {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #E4E7ED;
+}
+
+.order-col:last-child {
+    border-bottom: none;
+    padding-top: 15px;
+    font-size: 18px;
+}
+
+.empty-cart {
+    padding: 60px 20px;
+}
+
+.primary-btn {
+    display: inline-block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px 20px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.order-submit {
+    background: #1679AB;
+    color: white;
+}
+
+.order-submit:hover {
+    background: #B8001E;
+    color: white;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateQuantity(cartId, change) {
+    const qtyInput = document.getElementById('qty-' + cartId);
+    let currentQty = parseInt(qtyInput.value);
+    let newQty = Math.max(1, currentQty + change);
+    
+    qtyInput.value = newQty;
+    updateCartItem(cartId, newQty);
+}
+
+function updateQuantityInput(cartId, newQty) {
+    newQty = Math.max(1, parseInt(newQty));
+    updateCartItem(cartId, newQty);
+}
+
+function updateCartItem(cartId, quantity) {
+    fetch(`/api/cart/${cartId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'UserID': 1, // Temporary user ID for demo
+            'ProductID': 1, // This will be filled properly in backend
+            'SoLuong': quantity
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            // Update the total for this item and grand total
+            location.reload(); // Temporary solution - reload the page
+        }
+    })
+    .catch(error => {
+        console.error('Error updating cart:', error);
+        alert('Có lỗi xảy ra khi cập nhật giỏ hàng');
+    });
+}
+
+function removeFromCart(cartId) {
+    if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
+        fetch(`/api/cart/${cartId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                // Remove the item from display
+                document.getElementById('cart-item-' + cartId).remove();
+                
+                // Update grand total
+                location.reload(); // Temporary solution - reload the page
+            }
+        })
+        .catch(error => {
+            console.error('Error removing from cart:', error);
+            alert('Có lỗi xảy ra khi xóa sản phẩm');
+        });
+    }
+}
+
+function addToCart(productId) {
+    fetch('/api/cart/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'UserID': 1, // Temporary user ID for demo
+            'ProductID': productId,
+            'SoLuong': 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert('Đã thêm sản phẩm vào giỏ hàng!');
+            // Update cart count if needed
+            location.reload(); // Temporary solution
+        }
+    })
+    .catch(error => {
+        console.error('Error adding to cart:', error);
+        alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
+    });
+}
+</script>
+{% endblock %}

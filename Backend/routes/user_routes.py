@@ -14,6 +14,12 @@ user_model = user_ns.model('User', {
     'Age': fields.Integer(description='Tuổi người dùng')
 })
 
+# Định nghĩa model đăng nhập cho Swagger
+login_model = user_ns.model('Login', {
+    'email': fields.String(required=True, description='Email người dùng'),
+    'password': fields.String(required=True, description='Mật khẩu người dùng')
+})
+
 @user_ns.route('/')
 class UserList(Resource):
     @user_ns.doc('get_users')
@@ -86,3 +92,38 @@ class User(Resource):
         user.Age = data.get('Age', user.Age)
         db.session.commit()
         return {'message': 'Thông tin người dùng đã được cập nhật thành công!'}
+
+@user_ns.route('/login')
+class UserLogin(Resource):
+    @user_ns.expect(login_model)
+    @user_ns.doc('user_login')
+    def post(self):
+        """Đăng nhập người dùng"""
+        data = user_ns.payload
+        email = data.get('email')
+        password = data.get('password')
+        
+        if not email or not password:
+            return {'status': 'error', 'message': 'Email và mật khẩu không được để trống!'}, 400
+        
+        # Tìm người dùng theo email
+        user = NguoiDung.query.filter_by(Email=email).first()
+        
+        if not user:
+            return {'status': 'error', 'message': 'Email không tồn tại trong hệ thống!'}, 404
+        
+        # Kiểm tra mật khẩu (trong thực tế nên sử dụng hash)
+        if user.Pass != password:
+            return {'status': 'error', 'message': 'Mật khẩu không đúng!'}, 401
+        
+        return {
+            'status': 'success',
+            'message': 'Đăng nhập thành công!',
+            'user': {
+                'UserID': user.UserID,
+                'Ten': user.Ten,
+                'Email': user.Email,
+                'VaiTro': user.Role,
+                'Tuoi': user.Age
+            }
+        }, 200

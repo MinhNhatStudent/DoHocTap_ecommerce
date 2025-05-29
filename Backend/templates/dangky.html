@@ -1,0 +1,450 @@
+{% extends "base.html" %}
+
+{% block title %}Đăng ký - Hệ Tư Vấn Thông Tin{% endblock %}
+
+{% block content %}
+<!-- BREADCRUMB -->
+<div id="breadcrumb" class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="breadcrumb-tree">
+                    <li><a href="{{ url_for('view_bp.index') }}">Trang chủ</a></li>
+                    <li class="active">Đăng ký</li>
+                </ul>
+            </div>
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+<!-- /BREADCRUMB -->
+
+<!-- SECTION -->
+<div class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <div class="register-form">
+                    <div class="section-title text-center">
+                        <h3 class="title">Đăng ký tài khoản</h3>
+                        <p>Tạo tài khoản mới để trải nghiệm đầy đủ tính năng của hệ thống</p>
+                    </div>
+                    
+                    <!-- Display flash messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade in" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('view_bp.register') }}" class="register-form-container">
+                        <div class="form-group">
+                            <label for="name">Họ và tên <span class="required">*</span></label>
+                            <input type="text" 
+                                   class="input" 
+                                   id="name" 
+                                   name="name" 
+                                   placeholder="Nhập họ và tên của bạn"
+                                   value="{{ request.form.name if request.form.name }}"
+                                   required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email <span class="required">*</span></label>
+                            <input type="email" 
+                                   class="input" 
+                                   id="email" 
+                                   name="email" 
+                                   placeholder="Nhập địa chỉ email của bạn"
+                                   value="{{ request.form.email if request.form.email }}"
+                                   required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="age">Tuổi</label>
+                            <input type="number" 
+                                   class="input" 
+                                   id="age" 
+                                   name="age" 
+                                   placeholder="Nhập tuổi của bạn"
+                                   min="13" 
+                                   max="100"
+                                   value="{{ request.form.age if request.form.age }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Mật khẩu <span class="required">*</span></label>
+                            <input type="password" 
+                                   class="input" 
+                                   id="password" 
+                                   name="password" 
+                                   placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+                                   minlength="6"
+                                   required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password_confirm">Xác nhận mật khẩu <span class="required">*</span></label>
+                            <input type="password" 
+                                   class="input" 
+                                   id="password_confirm" 
+                                   name="password_confirm" 
+                                   placeholder="Nhập lại mật khẩu"
+                                   minlength="6"
+                                   required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="input-checkbox">
+                                <input type="checkbox" id="terms" name="terms" required>
+                                <label for="terms">
+                                    <span></span>
+                                    Tôi đồng ý với <a href="#" class="terms-link">Điều khoản dịch vụ</a> và <a href="#" class="privacy-link">Chính sách bảo mật</a>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="primary-btn register-btn">
+                            <i class="fa fa-user-plus"></i> Đăng ký
+                        </button>
+                        
+                        <div class="register-links">
+                            <hr>
+                            <p class="text-center">
+                                Đã có tài khoản? 
+                                <a href="{{ url_for('view_bp.login') }}" class="login-link">Đăng nhập ngay</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+<!-- /SECTION -->
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.register-form {
+    background: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border: 1px solid #E4E7ED;
+}
+
+.register-form-container {
+    margin-top: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.required {
+    color: #1679AB;
+}
+
+.input {
+    width: 100%;
+    height: 45px;
+    padding: 0 15px;
+    border: 1px solid #E4E7ED;
+    border-radius: 4px;
+    background: #FFF;
+    font-size: 14px;
+    color: #102C57;
+    transition: all 0.3s;
+}
+
+.input:focus {
+    border-color: #1679AB;
+    outline: none;
+    box-shadow: 0 0 5px rgba(209, 0, 36, 0.3);
+}
+
+.input-checkbox {
+    margin: 20px 0;
+}
+
+.input-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.input-checkbox label {
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+    display: block;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.input-checkbox label span {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #E4E7ED;
+    border-radius: 3px;
+    background: #FFF;
+}
+
+.input-checkbox label span:after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 0px;
+    width: 10px;
+    height: 5px;
+    border: 2px solid #1679AB;
+    border-top: none;
+    border-right: none;
+    transform: rotate(-45deg);
+    opacity: 0;
+    transition: all 0.3s;
+}
+
+.input-checkbox input[type="checkbox"]:checked + label span:after {
+    opacity: 1;
+}
+
+.input-checkbox input[type="checkbox"]:checked + label span {
+    border-color: #1679AB;
+    background: #FFF;
+}
+
+.primary-btn {
+    width: 100%;
+    height: 50px;
+    background: #1679AB;
+    color: #FFF;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 20px;
+}
+
+.primary-btn:hover {
+    background: #B8001E;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(209, 0, 36, 0.3);
+}
+
+.register-links {
+    margin-top: 30px;
+}
+
+.register-links hr {
+    border: none;
+    height: 1px;
+    background: #E4E7ED;
+    margin: 20px 0;
+}
+
+.register-links p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.login-link, .terms-link, .privacy-link {
+    color: #1679AB;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.login-link:hover, .terms-link:hover, .privacy-link:hover {
+    color: #B8001E;
+    text-decoration: underline;
+}
+
+.alert {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+
+.alert-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+.alert-warning {
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+}
+
+.alert-info {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+
+.close {
+    float: right;
+    font-size: 21px;
+    font-weight: bold;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .2;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.close:hover {
+    opacity: .5;
+}
+
+.fade.in {
+    opacity: 1;
+}
+
+.section-title {
+    margin-bottom: 30px;
+}
+
+.section-title h3.title {
+    color: #102C57;
+    font-size: 28px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
+
+.section-title p {
+    color: #666;
+    font-size: 16px;
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .register-form {
+        padding: 30px 20px;
+        margin: 20px 10px;
+    }
+    
+    .section-title h3.title {
+        font-size: 24px;
+    }
+    
+    .section-title p {
+        font-size: 14px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-hide alerts after 5 seconds
+$(document).ready(function() {
+    $('.alert').each(function() {
+        var alert = $(this);
+        setTimeout(function() {
+            alert.fadeOut('slow');
+        }, 5000);
+    });
+});
+
+// Form validation
+document.querySelector('.register-form-container').addEventListener('submit', function(e) {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password_confirm').value;
+    const terms = document.getElementById('terms').checked;
+    
+    // Check required fields
+    if (!name || !email || !password || !passwordConfirm) {
+        e.preventDefault();
+        alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+        return false;
+    }
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        e.preventDefault();
+        alert('Vui lòng nhập địa chỉ email hợp lệ');
+        return false;
+    }
+    
+    // Password length validation
+    if (password.length < 6) {
+        e.preventDefault();
+        alert('Mật khẩu phải có ít nhất 6 ký tự');
+        return false;
+    }
+    
+    // Password confirmation validation
+    if (password !== passwordConfirm) {
+        e.preventDefault();
+        alert('Mật khẩu xác nhận không khớp');
+        return false;
+    }
+    
+    // Terms acceptance validation
+    if (!terms) {
+        e.preventDefault();
+        alert('Vui lòng đồng ý với điều khoản dịch vụ');
+        return false;
+    }
+});
+
+// Real-time password confirmation validation
+document.getElementById('password_confirm').addEventListener('input', function() {
+    const password = document.getElementById('password').value;
+    const passwordConfirm = this.value;
+    
+    if (passwordConfirm && password !== passwordConfirm) {
+        this.style.borderColor = '#1679AB';
+        this.style.boxShadow = '0 0 5px rgba(209, 0, 36, 0.3)';
+    } else {
+        this.style.borderColor = '#E4E7ED';
+        this.style.boxShadow = 'none';
+    }
+});
+</script>
+{% endblock %}

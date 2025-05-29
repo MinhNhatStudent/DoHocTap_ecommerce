@@ -45,7 +45,7 @@ class UserCart(Resource):
                     'UserID': item.UserID,
                     'ProductID': product.ProductID,
                     'Ten': product.Ten,
-                    'Loai': product.Loai,
+                    'NhanHang': product.NhanHang,
                     'Gia': float(product.Gia),
                     'SoLuong': item.SoLuong,
                     'HinhAnh': product.HinhAnh

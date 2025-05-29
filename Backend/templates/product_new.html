@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+
+{% block title %}Chi tiết sản phẩm - {{ product.Ten }}{% endblock %}
+
+{% block content %}
+		<!-- BREADCRUMB -->
+		<div id="breadcrumb" class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+					<div class="col-md-12">
+						<ul class="breadcrumb-tree">
+							<li><a href="{{ url_for('view_bp.index') }}">Trang chủ</a></li>
+							<li><a href="{{ url_for('view_bp.store') }}">Sản phẩm</a></li>
+							<li><a href="#">{{ product.NhanHang }}</a></li>
+							<li class="active">{{ product.Ten }}</li>
+						</ul>
+					</div>
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /BREADCRUMB -->
+
+		<!-- SECTION -->
+		<div class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+					<!-- Product main img -->
+					<div class="col-md-5 col-md-push-2">
+						<div id="product-main-img">
+							<div class="product-preview">
+								<img src="{{ product.HinhAnh }}" alt="{{ product.Ten }}">
+							</div>
+						</div>
+					</div>
+					<!-- /Product main img -->
+
+					<!-- Product thumb imgs -->
+					<div class="col-md-2 col-md-pull-5">
+						<div id="product-imgs">
+							<div class="product-preview">
+								<img src="{{ product.HinhAnh }}" alt="{{ product.Ten }}">
+							</div>
+						</div>
+					</div>
+					<!-- /Product thumb imgs -->
+
+					<!-- Product details -->
+					<div class="col-md-5">
+						<div class="product-details">
+							<h2 class="product-name">{{ product.Ten }}</h2>
+							<div>
+								<div class="product-rating">
+									<i class="fa fa-star"></i>
+									<i class="fa fa-star"></i>
+									<i class="fa fa-star"></i>
+									<i class="fa fa-star"></i>
+									<i class="fa fa-star-o"></i>
+								</div>
+								<a class="review-link" href="#">Đánh giá sản phẩm</a>
+							</div>
+							<div>
+								<h3 class="product-price">{{ "{:,.0f}".format(product.Gia) }} VNĐ</h3>
+								<span class="product-available">
+									{% if product.SoLuong > 0 %}
+										Còn hàng ({{ product.SoLuong }} sản phẩm)
+									{% else %}
+										Hết hàng
+									{% endif %}
+								</span>
+							</div>
+							<div class="product-description">
+								<p>{{ product.MoTa if product.MoTa else "Chưa có mô tả cho sản phẩm này." }}</p>
+							</div>
+
+							<div class="add-to-cart">
+								<div class="qty-label">
+									Số lượng
+									<div class="input-number">
+										<input type="number" id="quantity" value="1" min="1" max="{{ product.SoLuong }}">
+										<span class="qty-up">+</span>
+										<span class="qty-down">-</span>
+									</div>
+								</div>
+								<button class="add-to-cart-btn" onclick="addToCart({{ product.ProductID }})" 
+								        {% if product.SoLuong == 0 %}disabled{% endif %}>
+									<i class="fa fa-shopping-cart"></i> 
+									{% if product.SoLuong > 0 %}
+										Thêm vào giỏ hàng
+									{% else %}
+										Hết hàng
+									{% endif %}
+								</button>
+							</div>
+
+							<ul class="product-btns">
+								<li><a href="#"><i class="fa fa-heart-o"></i> Thêm vào danh sách yêu thích</a></li>
+								<li><a href="#"><i class="fa fa-exchange"></i> So sánh sản phẩm</a></li>
+							</ul>
+
+							<ul class="product-links">
+								<li>Nhãn hiệu:</li>
+								<li><a href="#">{{ product.NhanHang }}</a></li>
+							</ul>
+
+							<ul class="product-links">
+								<li>Chia sẻ:</li>
+								<li><a href="#"><i class="fa fa-facebook"></i></a></li>
+								<li><a href="#"><i class="fa fa-twitter"></i></a></li>
+								<li><a href="#"><i class="fa fa-google-plus"></i></a></li>
+								<li><a href="#"><i class="fa fa-envelope"></i></a></li>
+							</ul>
+
+						</div>
+					</div>
+					<!-- /Product details -->
+
+					<!-- Product tab -->
+					<div class="col-md-12">
+						<div id="product-tab">
+							<!-- product tab nav -->
+							<ul class="tab-nav">
+								<li class="active"><a data-toggle="tab" href="#tab1">Mô tả</a></li>
+								<li><a data-toggle="tab" href="#tab2">Thông số kỹ thuật</a></li>
+								<li><a data-toggle="tab" href="#tab3">Đánh giá</a></li>
+							</ul>
+							<!-- /product tab nav -->
+
+							<!-- product tab content -->
+							<div class="tab-content">
+								<!-- tab1  -->
+								<div id="tab1" class="tab-pane fade in active">
+									<div class="row">
+										<div class="col-md-12">
+											<p>{{ product.MoTa if product.MoTa else "Chưa có mô tả chi tiết cho sản phẩm này." }}</p>
+										</div>
+									</div>
+								</div>
+								<!-- /tab1  -->
+
+								<!-- tab2  -->
+								<div id="tab2" class="tab-pane fade in">
+									<div class="row">
+										<div class="col-md-12">
+											<ul>
+												<li><strong>Tên sản phẩm:</strong> {{ product.Ten }}</li>
+												<li><strong>Nhãn hiệu:</strong> {{ product.NhanHang }}</li>
+												<li><strong>Giá:</strong> {{ "{:,.0f}".format(product.Gia) }} VNĐ</li>
+												<li><strong>Số lượng còn lại:</strong> {{ product.SoLuong }}</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- /tab2  -->
+
+								<!-- tab3  -->
+								<div id="tab3" class="tab-pane fade in">
+									<div class="row">
+										<div class="col-md-12">
+											<p>Chức năng đánh giá sẽ được phát triển trong phiên bản tiếp theo.</p>
+										</div>
+									</div>
+								</div>
+								<!-- /tab3  -->
+							</div>
+							<!-- /product tab content  -->
+						</div>
+					</div>
+					<!-- /product tab -->
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /SECTION -->
+
+		<!-- Section -->
+		<div class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+
+					<div class="col-md-12">
+						<div class="section-title text-center">
+							<h3 class="title">Sản phẩm liên quan</h3>
+						</div>
+					</div>
+
+					{% if recommendation_error %}
+						<div class="col-md-12">
+							<div class="alert alert-warning text-center" style="background-color: #fcf8e3; border: 1px solid #faebcc; color: #8a6d3b; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+								<i class="fa fa-exclamation-triangle"></i> {{ recommendation_error }}
+							</div>
+						</div>
+					{% endif %}
+
+					{% if similar_products %}
+						{% for product_item in similar_products %}
+							<!-- product -->
+							<div class="col-md-3 col-xs-6">
+								<div class="product">
+									<div class="product-img">
+										<img src="{{ product_item.HinhAnh }}" alt="{{ product_item.Ten }}">
+										<div class="product-label">
+											{% if loop.index == 1 %}
+												<span class="new">MỚI</span>
+											{% endif %}
+										</div>
+									</div>
+									<div class="product-body">
+										<p class="product-category">{{ product_item.NhanHang }}</p>
+										<h3 class="product-name"><a href="{{ url_for('view_bp.product_detail', product_id=product_item.ProductID) }}">{{ product_item.Ten }}</a></h3>
+										<h4 class="product-price">{{ "{:,.0f}".format(product_item.Gia) }} VNĐ</h4>
+									</div>
+									<div class="add-to-cart">
+										<button class="add-to-cart-btn" onclick="addToCart({{ product_item.ProductID }})">
+											<i class="fa fa-shopping-cart"></i> Thêm vào giỏ
+										</button>
+									</div>
+								</div>
+							</div>
+							<!-- /product -->
+						{% endfor %}
+					{% else %}
+						<div class="col-md-12">
+							<p class="text-center">Không có sản phẩm liên quan</p>
+						</div>
+					{% endif %}
+
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /Section -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Get user ID from template context (safe JavaScript generation)
+var currentUserId = {% if current_user.logged_in %}{{ current_user.id }}{% else %}1{% endif %};
+var currentProductId = {{ product.ProductID }};
+
+// Track product view interaction when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Record product view interaction
+    recordInteraction(currentProductId, 'view');
+});
+
+// Function to record user interactions
+function recordInteraction(productId, interactionType) {
+    fetch('/api/interactions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            UserID: currentUserId,
+            ProductID: productId,
+            InteractionType: interactionType,
+            SoLanXem: interactionType === 'view' ? 1 : 0,
+            ThoiGianXem: 0
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Interaction recorded:', data);
+    })
+    .catch(function(error) {
+        console.error('Error recording interaction:', error);
+    });
+}
+
+// Function to add product to cart
+function addToCart(productId) {
+    var quantity = document.getElementById('quantity').value;
+    
+    fetch('/cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            user_id: currentUserId,
+            product_id: productId,
+            quantity: parseInt(quantity)
+        }),
+    })
+    .then(response => response.json())
+    .then(function(data) {
+        if(data.status === 'success' || data.message) {
+            alert('Đã thêm ' + quantity + ' sản phẩm vào giỏ hàng!');
+            
+            // Record cart interaction
+            recordInteraction(productId, 'cart');
+        } else if(data.error) {
+            alert('Lỗi: ' + data.error);
+        }
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!');
+    });
+}
+
+// Track time spent on page
+var startTime = Date.now();
+var timeSpent = 0;
+
+// Update time spent every 5 seconds
+setInterval(function() {
+    timeSpent = Math.floor((Date.now() - startTime) / 1000);
+}, 5000);
+
+// Track when user leaves the page (update view time)
+window.addEventListener('beforeunload', function() {
+    if (timeSpent > 10) { // Only track if user spent more than 10 seconds
+        // Use fetch with keepalive for better browser support
+        fetch('/api/interactions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                UserID: currentUserId,
+                ProductID: currentProductId,
+                InteractionType: 'view',
+                SoLanXem: 1,
+                ThoiGianXem: timeSpent
+            }),
+            keepalive: true
+        }).catch(function() {
+            // Fallback to sendBeacon if fetch fails
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon('/api/interactions', JSON.stringify({
+                    UserID: currentUserId,
+                    ProductID: currentProductId,
+                    InteractionType: 'view',
+                    SoLanXem: 1,
+                    ThoiGianXem: timeSpent
+                }));
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
