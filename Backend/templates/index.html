@@ -66,7 +66,7 @@
             <!-- section title -->
             <div class="col-md-12">
                 <div class="section-title text-center" style="margin-bottom: 40px;">
-                    <h2 class="title" style="color: #1679AB; font-size: 32px; text-transform: uppercase; font-weight: 700;">Sản Phẩm Phổ Biến Nhất</h2>
+                    <h2 class="title" style="color: #D10024; font-size: 32px; text-transform: uppercase; font-weight: 700;">Sản Phẩm Phổ Biến Nhất</h2>
                     <p style="font-size: 16px; margin-top: 15px;">Những sản phẩm được yêu thích và tìm kiếm nhiều nhất</p>
                 </div>
             </div>
@@ -81,17 +81,17 @@
                     <div class="product-img">
                         <img src="{{ get_image_url(product.HinhAnh) }}" alt="{{ product.Ten }}" style="max-height: 200px; margin: 0 auto;">
                         <div class="product-label">
-                            <span class="new" style="background-color: #FF9800;">TOP</span>
+                            <span class="new" style="background-color: #1C6DD0;">TOP</span>
                         </div>
                         <div class="product-body">
                             <h3 class="product-name" style="height: 40px; overflow: hidden;"><a href="{{ url_for('view_bp.product_detail', product_id=product.ProductID) }}">{{ product.Ten }}</a></h3>
-                            <h4 class="product-price" style="color: #1679AB; font-size: 18px; font-weight: 700;">{{ "{:,.0f}".format(product.Gia) }} đ</h4>
+                            <h4 class="product-price" style="color: #D10024; font-size: 18px; font-weight: 700;">{{ "{:,.0f}".format(product.Gia) }} đ</h4>
                             <div class="product-rating">
-                                <i class="fa fa-star" style="color: gold;"></i>
-                                <i class="fa fa-star" style="color: gold;"></i>
-                                <i class="fa fa-star" style="color: gold;"></i>
-                                <i class="fa fa-star" style="color: gold;"></i>
-                                <i class="fa fa-star" style="color: gold;"></i>
+                                <i class="fa fa-star" style="color: #1C6DD0;"></i>
+                                <i class="fa fa-star" style="color: #1C6DD0;"></i>
+                                <i class="fa fa-star" style="color: #1C6DD0;"></i>
+                                <i class="fa fa-star" style="color: #1C6DD0;"></i>
+                                <i class="fa fa-star" style="color: #1C6DD0;"></i>
                             </div>
                             <div class="product-btns">
                                 <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">Yêu thích</span></button>
@@ -99,7 +99,7 @@
                             </div>
                         </div>
                         <div class="add-to-cart">
-                            <button class="add-to-cart-btn" onclick="addToCart({{ product.ProductID }})" style="background-color: #1679AB; border-radius: 40px;"><i class="fa fa-shopping-cart"></i> Thêm vào giỏ</button>
+                            <button class="add-to-cart-btn" onclick="addToCart({{ product.ProductID }})" style="background-color: #D10024; border-radius: 40px;"><i class="fa fa-shopping-cart"></i> Thêm vào giỏ</button>
                         </div>
                     </div>
                 </div>
@@ -110,7 +110,7 @@
         
         <div class="row">
             <div class="col-md-12 text-center" style="margin-top: 30px;">
-                <a href="{{ url_for('view_bp.store') }}" class="primary-btn cta-btn" style="background-color: #1679AB; padding: 12px 30px; border-radius: 40px; font-size: 16px;">Xem thêm sản phẩm</a>
+                <a href="{{ url_for('view_bp.store') }}" class="primary-btn cta-btn" style="background-color: #D10024; padding: 12px 30px; border-radius: 40px; font-size: 16px;">Xem thêm sản phẩm</a>
             </div>
         </div>
     </div>
