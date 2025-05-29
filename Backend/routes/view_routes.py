@@ -119,15 +119,20 @@ def product_detail(product_id):
         print(f"Error calling recommendation API: {e}")
         recommendation_error = "Không thể tải sản phẩm tương tự từ hệ thống đề xuất. Hiển thị sản phẩm thay thế."
         similar_products = SanPham.query.filter(SanPham.ProductID != product_id).order_by(db.func.random()).limit(4).all()
-    
-    # Tạo tương tác xem sản phẩm (giả sử user_id=1)
+      # Tạo tương tác xem sản phẩm
     try:
-        requests.post('http://localhost:5000/interactions', json={
-            'user_id': 1,  # Giả sử user_id là 1 cho demo
-            'product_id': product_id,
-            'interaction_type': 'view'
+        user_id = session.get('user_id', 1)  # Lấy user_id từ session, mặc định là 1 cho demo
+        
+        # Gọi API interactions để ghi nhận tương tác xem
+        requests.post('http://localhost:5000/api/interactions', json={
+            'UserID': user_id,
+            'ProductID': product_id,
+            'InteractionType': 'view',
+            'SoLanXem': 1,
+            'ThoiGianXem': 0
         })
-    except:
+    except Exception as e:
+        print(f"Error recording view interaction: {e}")
         pass  # Bỏ qua lỗi nếu không thể tạo tương tác
     
     return render_template('product.html', product=product, similar_products=similar_products, recommendation_error=recommendation_error)

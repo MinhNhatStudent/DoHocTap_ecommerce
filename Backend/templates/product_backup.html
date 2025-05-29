@@ -201,31 +201,50 @@
 					{% endif %}
 
 					{% if similar_products %}
-						{% for product_item in similar_products %}
-							<!-- product -->
-							<div class="col-md-3 col-xs-6">
-								<div class="product">
-									<div class="product-img">
-										<img src="{{ product_item.HinhAnh }}" alt="{{ product_item.Ten }}">
-										<div class="product-label">
-											{% if loop.index == 1 %}
-												<span class="new">MỚI</span>
-											{% endif %}
-										</div>
+						{% for product in similar_products %}
+						<!-- product -->
+						<div class="col-md-3 col-xs-6">
+							<div class="product">
+								<div class="product-img">
+									<img src="{{ product.HinhAnh }}" alt="{{ product.Ten }}">
+								</div>
+								<div class="product-body">
+									<p class="product-category">{{ product.NhanHang }}</p>
+									<h3 class="product-name">
+										<a href="{{ url_for('view_bp.product_detail', product_id=product.ProductID) }}">
+											{{ product.Ten[:50] }}{% if product.Ten|length > 50 %}...{% endif %}
+										</a>
+									</h3>
+									<h4 class="product-price">{{ "{:,.0f}".format(product.Gia) }} VNĐ</h4>
+									<div class="product-rating">
+										<i class="fa fa-star"></i>
+										<i class="fa fa-star"></i>
+										<i class="fa fa-star"></i>
+										<i class="fa fa-star"></i>
+										<i class="fa fa-star-o"></i>
 									</div>
-									<div class="product-body">
-										<p class="product-category">{{ product_item.NhanHang }}</p>
-										<h3 class="product-name"><a href="{{ url_for('view_bp.product_detail', product_id=product_item.ProductID) }}">{{ product_item.Ten }}</a></h3>
-										<h4 class="product-price">{{ "{:,.0f}".format(product_item.Gia) }} VNĐ</h4>
-									</div>
-									<div class="add-to-cart">
-										<button class="add-to-cart-btn" onclick="addToCart({{ product_item.ProductID }})">
-											<i class="fa fa-shopping-cart"></i> Thêm vào giỏ
+									<div class="product-btns">
+										<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">Thêm vào danh sách yêu thích</span></button>
+										<button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">So sánh</span></button>
+										<button class="quick-view" onclick="window.location.href='{{ url_for('view_bp.product_detail', product_id=product.ProductID) }}'">
+											<i class="fa fa-eye"></i><span class="tooltipp">Xem chi tiết</span>
 										</button>
 									</div>
 								</div>
+								<div class="add-to-cart">
+									<button class="add-to-cart-btn" onclick="addToCart({{ product.ProductID }})" 
+									        {% if product.SoLuong == 0 %}disabled{% endif %}>
+										<i class="fa fa-shopping-cart"></i> 
+										{% if product.SoLuong > 0 %}
+											Thêm vào giỏ
+										{% else %}
+											Hết hàng
+										{% endif %}
+									</button>
+								</div>
 							</div>
-							<!-- /product -->
+						</div>
+						<!-- /product -->
 						{% endfor %}
 					{% else %}
 						<div class="col-md-12">
@@ -244,14 +263,13 @@
 
 {% block extra_js %}
 <script>
-// Get user ID from template context (safe JavaScript generation)
-var currentUserId = {% if current_user.logged_in %}{{ current_user.id }}{% else %}1{% endif %};
-var currentProductId = {{ product.ProductID }};
+// Get user ID from template context
+const currentUserId = {% if current_user.logged_in %}{{ current_user.id }}{% else %}1{% endif %};
 
 // Track product view interaction when page loads
 document.addEventListener('DOMContentLoaded', function() {
     // Record product view interaction
-    recordInteraction(currentProductId, 'view');
+    recordInteraction({{ product.ProductID }}, 'view');
 });
 
 // Function to record user interactions
@@ -273,14 +291,14 @@ function recordInteraction(productId, interactionType) {
     .then(data => {
         console.log('Interaction recorded:', data);
     })
-    .catch(function(error) {
+    .catch((error) => {
         console.error('Error recording interaction:', error);
     });
 }
 
-// Function to add product to cart
+// Hàm thêm sản phẩm vào giỏ hàng
 function addToCart(productId) {
-    var quantity = document.getElementById('quantity').value;
+    const quantity = document.getElementById('quantity').value;
     
     fetch('/cart', {
         method: 'POST',
@@ -294,7 +312,7 @@ function addToCart(productId) {
         }),
     })
     .then(response => response.json())
-    .then(function(data) {
+    .then(data => {
         if(data.status === 'success' || data.message) {
             alert('Đã thêm ' + quantity + ' sản phẩm vào giỏ hàng!');
             
@@ -304,22 +322,22 @@ function addToCart(productId) {
             alert('Lỗi: ' + data.error);
         }
     })
-    .catch(function(error) {
+    .catch((error) => {
         console.error('Error:', error);
         alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!');
     });
 }
 
-// Track time spent on page
-var startTime = Date.now();
-var timeSpent = 0;
+// Track time spent on page (optional - for future use)
+let startTime = Date.now();
+let timeSpent = 0;
 
 // Update time spent every 5 seconds
 setInterval(function() {
     timeSpent = Math.floor((Date.now() - startTime) / 1000);
 }, 5000);
 
-// Track when user leaves the page (update view time)
+// Track when user leaves the page (optional)
 window.addEventListener('beforeunload', function() {
     if (timeSpent > 10) { // Only track if user spent more than 10 seconds
         // Use fetch with keepalive for better browser support
@@ -330,18 +348,18 @@ window.addEventListener('beforeunload', function() {
             },
             body: JSON.stringify({
                 UserID: currentUserId,
-                ProductID: currentProductId,
+                ProductID: {{ product.ProductID }},
                 InteractionType: 'view',
                 SoLanXem: 1,
                 ThoiGianXem: timeSpent
             }),
             keepalive: true
-        }).catch(function() {
+        }).catch(() => {
             // Fallback to sendBeacon if fetch fails
             if (navigator.sendBeacon) {
                 navigator.sendBeacon('/api/interactions', JSON.stringify({
                     UserID: currentUserId,
-                    ProductID: currentProductId,
+                    ProductID: {{ product.ProductID }},
                     InteractionType: 'view',
                     SoLanXem: 1,
                     ThoiGianXem: timeSpent
