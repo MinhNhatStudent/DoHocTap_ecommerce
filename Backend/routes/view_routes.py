@@ -90,16 +90,20 @@ def product_detail(product_id):
     Trang chi tiết sản phẩm, hiển thị thông tin sản phẩm và sản phẩm liên quan
     """
     # Lấy thông tin sản phẩm
-    product = SanPham.query.get_or_404(product_id)
-    
-    # Lấy các sản phẩm liên quan
+    product = SanPham.query.get_or_404(product_id)    # Lấy các sản phẩm liên quan
+    recommendation_error = None
     try:
-        response = requests.get(f'http://localhost:5000/recommend_bp/similar/{product_id}')
-        similar_products_data = response.json()
-        similar_product_ids = [item['ProductID'] for item in similar_products_data['similar_products']]
-        similar_products = SanPham.query.filter(SanPham.ProductID.in_(similar_product_ids)).all()
-    except:
+        response = requests.get(f'http://localhost:5000/api/vectorize/similar/{product_id}?count=4')
+        if response.status_code == 200:
+            similar_products_data = response.json()
+            similar_product_ids = [item['ProductID'] for item in similar_products_data]
+            similar_products = SanPham.query.filter(SanPham.ProductID.in_(similar_product_ids)).all()
+        else:
+            raise Exception(f"API returned status code: {response.status_code}")
+    except Exception as e:
         # Nếu có lỗi khi gọi API, hiển thị một số sản phẩm ngẫu nhiên
+        print(f"Error calling recommendation API: {e}")
+        recommendation_error = "Không thể tải sản phẩm tương tự từ hệ thống đề xuất. Hiển thị sản phẩm thay thế."
         similar_products = SanPham.query.filter(SanPham.ProductID != product_id).order_by(db.func.random()).limit(4).all()
     
     # Tạo tương tác xem sản phẩm (giả sử user_id=1)
@@ -112,7 +116,7 @@ def product_detail(product_id):
     except:
         pass  # Bỏ qua lỗi nếu không thể tạo tương tác
     
-    return render_template('product.html', product=product, similar_products=similar_products)
+    return render_template('product.html', product=product, similar_products=similar_products, recommendation_error=recommendation_error)
 
 @view_bp.route('/cart')
 def cart():

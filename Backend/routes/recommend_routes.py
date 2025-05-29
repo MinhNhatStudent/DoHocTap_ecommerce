@@ -1,6 +1,11 @@
 from flask import Blueprint, jsonify, request
 from services.recommend import RecommendationService
 
+
+
+# Đây chỉ là một ví dụ về cách định nghĩa các route cho hệ thống gợi ý sản phẩm
+# Để sử dụng chức năng recommendation, bạn hãy sử dụng qua file product_vectorize.py
+
 recommend_bp = Blueprint('recommend_bp', __name__)
 recommendation_service = RecommendationService()
 
