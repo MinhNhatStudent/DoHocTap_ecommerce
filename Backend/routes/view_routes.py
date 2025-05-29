@@ -264,6 +264,7 @@ def cart():
         print(f"Error: {e}")
         return render_template('cart.html', cart_items=[], total=0, recommended_products=[])
 
+#Chức năng đăng nhập người dùng, cho phép người dùng đăng nhập vào hệ thống bằng email và mật khẩu, bên cạnh đó thiết lập và lưu trữ phiên
 @view_bp.route('/login', methods=['GET', 'POST'])
 def login():
     """
@@ -284,7 +285,6 @@ def login():
             return render_template('dangnhap.html', page_title="Đăng nhập")
         
         try:
-            # Sử dụng direct database query thay vì API call
             from models.user import NguoiDung
             user = NguoiDung.query.filter_by(Email=email).first()
             
@@ -292,7 +292,6 @@ def login():
                 flash('Email không tồn tại trong hệ thống!', 'danger')
                 return render_template('dangnhap.html', page_title="Đăng nhập")
             
-            # Kiểm tra mật khẩu (trong thực tế nên sử dụng hash)
             if user.Pass != password:
                 flash('Mật khẩu không đúng!', 'danger')
                 return render_template('dangnhap.html', page_title="Đăng nhập")
@@ -322,12 +321,13 @@ def login():
     
     return render_template('dangnhap.html', page_title="Đăng nhập")
 
+#Nhiệm vụ chức năng đăng ký người dùng, cách hoạt động là tạo người dùng mới trong cơ sở dữ liệu
 @view_bp.route('/register', methods=['GET', 'POST'])
 def register():
     """
     Trang đăng ký
     """
-    # Kiểm tra nếu user đã đăng nhập
+    
     if 'user_id' in session:
         flash('Bạn đã đăng nhập rồi!', 'info')
         return redirect(url_for('view_bp.index'))
@@ -340,34 +340,34 @@ def register():
         age = request.form.get('age')
         terms = request.form.get('terms')
         
-        # Validate required fields
+      
         if not ten or not email or not password or not password_confirm:
             flash('Vui lòng điền đầy đủ thông tin bắt buộc!', 'danger')
             return render_template('dangky.html', page_title="Đăng ký")
         
-        # Validate email format
+       
         import re
         email_regex = r'^[^\s@]+@[^\s@]+\.[^\s@]+$'
         if not re.match(email_regex, email):
             flash('Vui lòng nhập địa chỉ email hợp lệ!', 'danger')
             return render_template('dangky.html', page_title="Đăng ký")
         
-        # Validate password length
+       
         if len(password) < 6:
             flash('Mật khẩu phải có ít nhất 6 ký tự!', 'danger')
             return render_template('dangky.html', page_title="Đăng ký")
         
-        # Validate password confirmation
+        
         if password != password_confirm:
             flash('Mật khẩu xác nhận không khớp!', 'danger')
             return render_template('dangky.html', page_title="Đăng ký")
         
-        # Validate terms acceptance
+    
         if not terms:
             flash('Vui lòng đồng ý với điều khoản dịch vụ!', 'danger')
             return render_template('dangky.html', page_title="Đăng ký")
         
-        # Validate age if provided
+      
         if age:
             try:
                 age = int(age)
@@ -379,18 +379,18 @@ def register():
                 return render_template('dangky.html', page_title="Đăng ký")
         
         try:
-            # Check if email already exists using direct database query
+           
             from models.user import NguoiDung
             existing_user = NguoiDung.query.filter_by(Email=email).first()
             if existing_user:
                 flash('Email này đã được sử dụng! Vui lòng chọn email khác.', 'danger')
                 return render_template('dangky.html', page_title="Đăng ký")
             
-            # Create new user directly in database
+          
             new_user = NguoiDung(
                 Ten=ten,
                 Email=email,
-                Pass=password,  # In production, should hash this password
+                Pass=password,  
                 Role='user',
                 Age=age if age else None
             )
