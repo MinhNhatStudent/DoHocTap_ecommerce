@@ -46,10 +46,14 @@
 						<li><a href="#"><i class="fa fa-phone"></i> +084-123-456-789</a></li>
 						<li><a href="#"><i class="fa fa-envelope-o"></i> contact@hetuvan.com</a></li>
 						<li><a href="#"><i class="fa fa-map-marker"></i> Hà Nội, Việt Nam</a></li>
-					</ul>
-					<ul class="header-links pull-right">
-						<li><a href="{{ url_for('view_bp.login') }}"><i class="fa fa-user-o"></i> Đăng nhập</a></li>
-						<li><a href="{{ url_for('view_bp.register') }}"><i class="fa fa-user-plus"></i> Đăng ký</a></li>
+					</ul>					<ul class="header-links pull-right">
+						{% if current_user.logged_in %}
+							<li><a href="#"><i class="fa fa-user"></i> Xin chào, {{ current_user.name }}</a></li>
+							<li><a href="{{ url_for('view_bp.logout') }}"><i class="fa fa-sign-out"></i> Đăng xuất</a></li>
+						{% else %}
+							<li><a href="{{ url_for('view_bp.login') }}"><i class="fa fa-user-o"></i> Đăng nhập</a></li>
+							<li><a href="{{ url_for('view_bp.register') }}"><i class="fa fa-user-plus"></i> Đăng ký</a></li>
+						{% endif %}
 					</ul>
 				</div>
 			</div>

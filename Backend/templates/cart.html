@@ -44,9 +44,8 @@
                     {% for item in cart_items %}
                     <div class="cart-item" id="cart-item-{{ item.CartID }}">
                         <div class="row">
-                            <div class="col-md-2">
-                                <div class="product-img">
-                                    <img src="{{ url_for('static', filename='img/' + (item.HinhAnh if item.HinhAnh else 'no-image.jpg')) }}" alt="{{ item.Ten }}" style="width: 80px; height: 80px; object-fit: cover;">
+                            <div class="col-md-2">                                <div class="product-img">
+                                    <img src="{{ get_image_url(item.HinhAnh) }}" alt="{{ item.Ten }}" style="width: 80px; height: 80px; object-fit: cover;">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -140,9 +139,8 @@
         <div class="row">
             {% for product in recommended_products %}
             <div class="col-md-3 col-xs-6">
-                <div class="product">
-                    <div class="product-img">
-                        <img src="{{ url_for('static', filename='img/' + (product.HinhAnh if product.HinhAnh else 'no-image.jpg')) }}" alt="{{ product.Ten }}">
+                <div class="product">                    <div class="product-img">
+                        <img src="{{ get_image_url(product.HinhAnh) }}" alt="{{ product.Ten }}">
                         <div class="product-label">
                             <span class="new">ĐỀ XUẤT</span>
                         </div>

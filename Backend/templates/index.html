@@ -79,7 +79,7 @@
             <div class="col-md-3 col-xs-6">
                 <div class="product" style="background-color: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); padding: 15px; margin-bottom: 30px; transition: all 0.3s;">
                     <div class="product-img">
-                        <img src="{{ product.HinhAnh }}" alt="{{ product.Ten }}" style="max-height: 200px; margin: 0 auto;">
+                        <img src="{{ get_image_url(product.HinhAnh) }}" alt="{{ product.Ten }}" style="max-height: 200px; margin: 0 auto;">
                         <div class="product-label">
                             <span class="new" style="background-color: #FF9800;">TOP</span>
                         </div>
@@ -148,11 +148,10 @@
                         <!-- tab -->
                         <div id="tab1" class="tab-pane active">
                             <div class="products-slick" data-nav="#slick-nav-1">
-                                {% for product in newest_products %}
-                                <!-- product -->
+                                {% for product in newest_products %}                                <!-- product -->
                                 <div class="product">
                                     <div class="product-img">
-                                        <img src="{{ product.HinhAnh }}" alt="{{ product.Ten }}">
+                                        <img src="{{ get_image_url(product.HinhAnh) }}" alt="{{ product.Ten }}">
                                         <div class="product-label">
                                             <span class="new">MỚI</span>
                                         </div>
@@ -269,11 +268,10 @@
                         <!-- tab -->
                         <div id="tab-bestseller" class="tab-pane active">
                             <div class="products-slick" data-nav="#slick-nav-bestseller">
-                                {% for product in bestseller_products %}
-                                <!-- product -->
+                                {% for product in bestseller_products %}                                <!-- product -->
                                 <div class="product">
                                     <div class="product-img">
-                                        <img src="{{ product.HinhAnh }}" alt="{{ product.Ten }}">
+                                        <img src="{{ get_image_url(product.HinhAnh) }}" alt="{{ product.Ten }}">
                                         <div class="product-label">
                                             <span class="sale">HOT</span>
                                         </div>
@@ -344,11 +342,10 @@
                         <!-- tab -->
                         <div id="tab2" class="tab-pane fade in active">
                             <div class="products-slick" data-nav="#slick-nav-2">
-                                {% for product in all_products[:8] %}
-                                <!-- product -->
+                                {% for product in all_products[:8] %}                                <!-- product -->
                                 <div class="product">
                                     <div class="product-img">
-                                        <img src="{{ product.HinhAnh }}" alt="{{ product.Ten }}">
+                                        <img src="{{ get_image_url(product.HinhAnh) }}" alt="{{ product.Ten }}">
                                     </div>
                                     <div class="product-body">
                                         <h3 class="product-name"><a href="{{ url_for('view_bp.product_detail', product_id=product.ProductID) }}">{{ product.Ten }}</a></h3>
@@ -399,13 +396,12 @@
                     </div>
                 </div>
 
-                <div class="products-widget-slick" data-nav="#slick-nav-3">
-                    <div>
+                <div class="products-widget-slick" data-nav="#slick-nav-3">                    <div>
                         {% for product in thienlong_products[:3] %}
                         <!-- product widget -->
                         <div class="product-widget">
                             <div class="product-img">
-                                <img src="{{ product.HinhAnh }}" alt="{{ product.Ten }}">
+                                <img src="{{ get_image_url(product.HinhAnh) }}" alt="{{ product.Ten }}">
                             </div>
                             <div class="product-body">
                                 <h3 class="product-name"><a href="{{ url_for('view_bp.product_detail', product_id=product.ProductID) }}">{{ product.Ten }}</a></h3>

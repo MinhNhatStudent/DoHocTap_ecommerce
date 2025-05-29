@@ -75,27 +75,28 @@ As you complete tasks and references relevant files, update this file as our mem
 - [x] Hiển thị sản phẩm đề xuất dựa trên giỏ hàng
 
 #### 3.2.4. Trang đăng nhập
-- [ ] Tạo form đăng nhập trong dangnhap.html
-- [ ] Tạo route xử lý đăng nhập
-- [ ] Thiết lập xác thực người dùng và session
-- [ ] Xử lý lỗi đăng nhập và hiển thị thông báo
+- [x] Tạo form đăng nhập trong dangnhap.html
+- [x] Tạo route xử lý đăng nhập
+- [x] Thiết lập xác thực người dùng và session
+- [x] Xử lý lỗi đăng nhập và hiển thị thông báo
 
 #### 3.2.5. Trang đăng ký
-- [ ] Tạo form đăng ký trong dangky.html khác
-- [ ] Tạo route xử lý đăng ký
-- [ ] Kiểm tra và xác thực dữ liệu đăng ký
-- [ ] Xử lý lỗi đăng ký và hiển thị thông báo
+- [x] Tạo form đăng ký trong dangky.html
+- [x] Tạo route xử lý đăng ký
+- [x] Kiểm tra và xác thực dữ liệu đăng ký
+- [x] Xử lý lỗi đăng ký và hiển thị thông báo
 
 #### 3.2.6. Trang danh sách sản phẩm 
 - [ ] Tạo trang danh sách sản phẩm trong store.html để kế thừa từ base.html
 - [ ] Tạo chức năng lọc và tìm kiếm theo nhãn hàng, thời gian, giá thành
 
-### 3.3. Tích hợp API
-- [ ] Kết nối API Users
-- [ ] Kết nối API Products
-- [ ] Kết nối API Recommendations
-- [ ] Kết nối API Cart
-- [ ] Kết nối API Interactions
+### 3.2.7. Chức năng thu thập tương tác người dùng
+- [ ] 
+- [ ]
+- [ ]
+
+
+
 
 ## 4. Phát triển hệ thống đề xuất
 

@@ -7,6 +7,19 @@ from models.database import db
 
 view_bp = Blueprint('view_bp', __name__)
 
+def get_image_url(hinh_anh):
+    """
+    Helper function to get proper image URL
+    Returns full URL if it starts with http/https, otherwise prepends static path
+    """
+    if not hinh_anh:
+        return url_for('static', filename='img/noimage.jpg')
+    
+    if hinh_anh.startswith(('http://', 'https://')):
+        return hinh_anh
+    else:
+        return url_for('static', filename=f'img/{hinh_anh}')
+
 @view_bp.route('/')
 def index():
     """
@@ -119,13 +132,62 @@ def product_detail(product_id):
     
     return render_template('product.html', product=product, similar_products=similar_products, recommendation_error=recommendation_error)
 
-@view_bp.route('/cart')
+@view_bp.route('/cart', methods=['GET', 'POST'])
 def cart():
     """
-    Trang giỏ hàng
+    Trang giỏ hàng - GET: hiển thị giỏ hàng, POST: thêm sản phẩm vào giỏ hàng
     """
-    # Giả sử user_id=1 cho demo
-    user_id = 1
+    if request.method == 'POST':
+        # Xử lý thêm sản phẩm vào giỏ hàng
+        try:
+            from models.cart import Cart
+            
+            # Lấy dữ liệu từ JSON request
+            data = request.get_json()
+            if not data:
+                return jsonify({'error': 'Không có dữ liệu được gửi'}), 400
+                
+            # Lấy user_id từ session, nếu không có thì sử dụng mặc định hoặc từ request
+            user_id = session.get('user_id', data.get('user_id', 1))
+            product_id = data.get('product_id')
+            quantity = data.get('quantity', 1)
+            
+            if not product_id:
+                return jsonify({'error': 'Thiếu thông tin sản phẩm'}), 400
+            
+            # Kiểm tra xem sản phẩm có tồn tại không
+            product = SanPham.query.get(product_id)
+            if not product:
+                return jsonify({'error': 'Sản phẩm không tồn tại'}), 404
+            
+            # Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+            existing_item = Cart.query.filter_by(UserID=user_id, ProductID=product_id).first()
+            
+            if existing_item:
+                # Nếu đã có, tăng số lượng
+                existing_item.SoLuong += quantity
+            else:
+                # Nếu chưa có, tạo mới
+                new_cart_item = Cart(
+                    UserID=user_id,
+                    ProductID=product_id,
+                                    SoLuong=quantity
+                )
+                db.session.add(new_cart_item)
+            
+            db.session.commit()
+            return jsonify({
+                'status': 'success', 
+                'message': 'Sản phẩm đã được thêm vào giỏ hàng!'
+            })
+            
+        except Exception as e:
+            print(f"Error adding to cart: {e}")
+            return jsonify({'error': f'Có lỗi xảy ra: {str(e)}'}), 500
+    
+    # GET request - hiển thị trang giỏ hàng
+    # Lấy user_id từ session, nếu không có thì sử dụng mặc định
+    user_id = session.get('user_id', 1)
     
     try:
         # Lấy sản phẩm trong giỏ hàng trực tiếp từ database
@@ -151,27 +213,40 @@ def cart():
                     'item_total': item_total
                 })
                 total += item_total
-        
-        # Lấy sản phẩm đề xuất dựa trên giỏ hàng
+          # Lấy sản phẩm đề xuất dựa trên giỏ hàng và lịch sử người dùng
         try:
-            # Lấy sản phẩm đề xuất cho người dùng
-            from services.recommend import RecommendationService
-            recommendation_service = RecommendationService()
+            # Sử dụng API vectorize để lấy đề xuất cá nhân hóa
+            response = requests.get(f'http://localhost:5000/api/vectorize/user/{user_id}?count=4')
             
-            # Lấy sản phẩm phổ biến làm đề xuất
-            recommended_data = recommendation_service.get_popular_products(4)
-            
-            if recommended_data:
-                recommended_ids = [item['ProductID'] for item in recommended_data]
-                recommended_products = SanPham.query.filter(SanPham.ProductID.in_(recommended_ids)).all()
+            if response.status_code == 200:
+                recommended_data = response.json()
                 
-                # Sắp xếp sản phẩm theo thứ tự như trong API
-                product_dict = {product.ProductID: product for product in recommended_products}
-                recommended_products = [product_dict[id] for id in recommended_ids if id in product_dict]
+                if recommended_data:
+                    recommended_ids = [item['ProductID'] for item in recommended_data]
+                    recommended_products = SanPham.query.filter(SanPham.ProductID.in_(recommended_ids)).all()
+                    
+                    # Sắp xếp sản phẩm theo thứ tự như trong API
+                    product_dict = {product.ProductID: product for product in recommended_products}
+                    recommended_products = [product_dict[id] for id in recommended_ids if id in product_dict]
+                else:
+                    recommended_products = SanPham.query.order_by(db.func.random()).limit(4).all()
             else:
-                recommended_products = SanPham.query.order_by(db.func.random()).limit(4).all()
+                # Nếu API không khả dụng, fallback về sản phẩm phổ biến
+                from services.recommend import RecommendationService
+                recommendation_service = RecommendationService()
+                recommended_data = recommendation_service.get_popular_products(4)
+                
+                if recommended_data:
+                    recommended_ids = [item['ProductID'] for item in recommended_data]
+                    recommended_products = SanPham.query.filter(SanPham.ProductID.in_(recommended_ids)).all()
+                    product_dict = {product.ProductID: product for product in recommended_products}
+                    recommended_products = [product_dict[id] for id in recommended_ids if id in product_dict]
+                else:
+                    recommended_products = SanPham.query.order_by(db.func.random()).limit(4).all()
+                    
         except Exception as e:
-            print(f"Error getting recommendations: {e}")
+            print(f"Error getting personalized recommendations: {e}")
+            # Fallback về sản phẩm ngẫu nhiên
             recommended_products = SanPham.query.order_by(db.func.random()).limit(4).all()
         
         return render_template(
@@ -189,31 +264,55 @@ def login():
     """
     Trang đăng nhập
     """
+    # Kiểm tra nếu user đã đăng nhập
+    if 'user_id' in session:
+        flash('Bạn đã đăng nhập rồi!', 'info')
+        return redirect(url_for('view_bp.index'))
+    
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
+        remember = request.form.get('remember')
+        
+        if not email or not password:
+            flash('Vui lòng điền đầy đủ thông tin đăng nhập!', 'danger')
+            return render_template('dangnhap.html', page_title="Đăng nhập")
         
         try:
-            # Gọi API kiểm tra đăng nhập
-            response = requests.post('http://localhost:5000/users/login', json={
-                'email': email,
-                'password': password
-            })
+            # Sử dụng direct database query thay vì API call
+            from models.user import NguoiDung
+            user = NguoiDung.query.filter_by(Email=email).first()
             
-            data = response.json()
+            if not user:
+                flash('Email không tồn tại trong hệ thống!', 'danger')
+                return render_template('dangnhap.html', page_title="Đăng nhập")
             
-            if data.get('status') == 'success':
-                # Lưu thông tin người dùng vào session
-                session['user_id'] = data['user']['UserID']
-                session['user_name'] = data['user']['Ten']
-                session['user_email'] = data['user']['Email']
-                session['user_role'] = data['user']['VaiTro']
-                
-                flash('Đăng nhập thành công!', 'success')
-                return redirect(url_for('view_bp.index'))
-            else:
-                flash('Email hoặc mật khẩu không đúng!', 'danger')
+            # Kiểm tra mật khẩu (trong thực tế nên sử dụng hash)
+            if user.Pass != password:
+                flash('Mật khẩu không đúng!', 'danger')
+                return render_template('dangnhap.html', page_title="Đăng nhập")
+            
+            # Lưu thông tin người dùng vào session
+            session['user_id'] = user.UserID
+            session['user_name'] = user.Ten
+            session['user_email'] = user.Email
+            session['user_role'] = user.Role
+            session['logged_in'] = True
+            
+            # Thiết lập thời gian session nếu remember me
+            if remember:
+                session.permanent = True
+            
+            flash('Đăng nhập thành công!', 'success')
+            
+            # Redirect to next page if specified, otherwise to index
+            next_page = request.args.get('next')
+            if next_page:
+                return redirect(next_page)
+            return redirect(url_for('view_bp.index'))
+            
         except Exception as e:
+            print(f"Login error: {e}")
             flash(f'Có lỗi xảy ra: {str(e)}', 'danger')
     
     return render_template('dangnhap.html', page_title="Đăng nhập")
@@ -223,36 +322,83 @@ def register():
     """
     Trang đăng ký
     """
+    # Kiểm tra nếu user đã đăng nhập
+    if 'user_id' in session:
+        flash('Bạn đã đăng nhập rồi!', 'info')
+        return redirect(url_for('view_bp.index'))
+    
     if request.method == 'POST':
         ten = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
         password_confirm = request.form.get('password_confirm')
+        age = request.form.get('age')
+        terms = request.form.get('terms')
         
-        # Kiểm tra xác nhận mật khẩu
+        # Validate required fields
+        if not ten or not email or not password or not password_confirm:
+            flash('Vui lòng điền đầy đủ thông tin bắt buộc!', 'danger')
+            return render_template('dangky.html', page_title="Đăng ký")
+        
+        # Validate email format
+        import re
+        email_regex = r'^[^\s@]+@[^\s@]+\.[^\s@]+$'
+        if not re.match(email_regex, email):
+            flash('Vui lòng nhập địa chỉ email hợp lệ!', 'danger')
+            return render_template('dangky.html', page_title="Đăng ký")
+        
+        # Validate password length
+        if len(password) < 6:
+            flash('Mật khẩu phải có ít nhất 6 ký tự!', 'danger')
+            return render_template('dangky.html', page_title="Đăng ký")
+        
+        # Validate password confirmation
         if password != password_confirm:
             flash('Mật khẩu xác nhận không khớp!', 'danger')
             return render_template('dangky.html', page_title="Đăng ký")
         
+        # Validate terms acceptance
+        if not terms:
+            flash('Vui lòng đồng ý với điều khoản dịch vụ!', 'danger')
+            return render_template('dangky.html', page_title="Đăng ký")
+        
+        # Validate age if provided
+        if age:
+            try:
+                age = int(age)
+                if age < 13 or age > 100:
+                    flash('Tuổi phải trong khoảng từ 13 đến 100!', 'danger')
+                    return render_template('dangky.html', page_title="Đăng ký")
+            except ValueError:
+                flash('Tuổi phải là một số hợp lệ!', 'danger')
+                return render_template('dangky.html', page_title="Đăng ký")
+        
         try:
-            # Gọi API đăng ký
-            response = requests.post('http://localhost:5000/users', json={
-                'Ten': ten,
-                'Email': email,
-                'MatKhau': password,
-                'VaiTro': 'user',
-                'Tuoi': 25  # Giá trị mặc định
-            })
+            # Check if email already exists using direct database query
+            from models.user import NguoiDung
+            existing_user = NguoiDung.query.filter_by(Email=email).first()
+            if existing_user:
+                flash('Email này đã được sử dụng! Vui lòng chọn email khác.', 'danger')
+                return render_template('dangky.html', page_title="Đăng ký")
             
-            data = response.json()
+            # Create new user directly in database
+            new_user = NguoiDung(
+                Ten=ten,
+                Email=email,
+                Pass=password,  # In production, should hash this password
+                Role='user',
+                Age=age if age else None
+            )
+            db.session.add(new_user)
+            db.session.commit()
             
-            if response.status_code == 201 or response.status_code == 200:
-                flash('Đăng ký thành công! Vui lòng đăng nhập.', 'success')
-                return redirect(url_for('view_bp.login'))
-            else:
-                flash(f'Có lỗi xảy ra: {data.get("message", "Lỗi không xác định")}', 'danger')
+            flash('Đăng ký thành công! Vui lòng đăng nhập.', 'success')
+            return redirect(url_for('view_bp.login'))
+            
         except Exception as e:
-            flash(f'Có lỗi xảy ra: {str(e)}', 'danger')
+            db.session.rollback()
+            print(f"Registration error: {e}")
+            flash('Có lỗi xảy ra khi đăng ký. Vui lòng thử lại!', 'danger')
     
     return render_template('dangky.html', page_title="Đăng ký")
 
@@ -261,9 +407,42 @@ def logout():
     """
     Đăng xuất người dùng
     """
-    session.clear()
-    flash('Đã đăng xuất thành công!', 'success')
+    if 'user_id' in session:
+        user_name = session.get('user_name', 'người dùng')
+        session.clear()
+        flash(f'Đã đăng xuất thành công! Hẹn gặp lại {user_name}.', 'success')
+    else:
+        flash('Bạn chưa đăng nhập!', 'info')
+    
     return redirect(url_for('view_bp.index'))
+
+# Helper function to check if user is logged in
+def login_required(f):
+    """Decorator để kiểm tra đăng nhập"""
+    from functools import wraps
+    
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Vui lòng đăng nhập để truy cập trang này!', 'warning')
+            return redirect(url_for('view_bp.login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Context processor to make user info available in all templates
+@view_bp.app_context_processor
+def inject_user():
+    """Inject user information into all templates"""
+    return dict(
+        current_user={
+            'id': session.get('user_id'),
+            'name': session.get('user_name'),
+            'email': session.get('user_email'),
+            'role': session.get('user_role'),
+            'logged_in': session.get('logged_in', False)
+        },
+        get_image_url=get_image_url
+    )
 
 @view_bp.route('/store')
 def store():

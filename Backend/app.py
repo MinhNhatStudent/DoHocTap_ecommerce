@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from datetime import timedelta
 from models.database import db
 from routes.swagger_routes import swagger_bp 
 from routes.view_routes import view_bp
@@ -14,6 +15,11 @@ app = Flask(__name__,
            )
 CORS(app)
 app.secret_key = 'hetuvan-secret-key-2023'  # Thêm secret key cho session
+
+# Cấu hình session
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)  # Session kéo dài 7 ngày nếu remember me
+app.config['SESSION_COOKIE_SECURE'] = False  # Đặt True nếu sử dụng HTTPS
+app.config['SESSION_COOKIE_HTTPONLY'] = True  # Bảo mật session cookie
 
 # Cấu hình kết nối MySQL
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:@localhost/hetuvan'
