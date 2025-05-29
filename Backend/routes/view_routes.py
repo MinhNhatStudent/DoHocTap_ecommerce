@@ -508,18 +508,83 @@ def store():
         db.func.min(SanPham.Gia).label('min_price'),
         db.func.max(SanPham.Gia).label('max_price')
     ).first()
-    
-    # Lấy số lượng sản phẩm theo từng thương hiệu
+      # Lấy số lượng sản phẩm theo từng thương hiệu
     brand_counts = {}
     for brand in brands:
         count = SanPham.query.filter(SanPham.NhanHang.ilike(f'%{brand}%')).count()
         brand_counts[brand] = count
+    
+    # Lấy sản phẩm đề xuất cho người dùng
+    recommended_products = []
+    user_id = session.get('user_id')
+    
+    if user_id:
+        # Người dùng đã đăng nhập - lấy đề xuất cá nhân hóa
+        try:
+            import requests
+            response = requests.get(f'http://localhost:5000/api/vectorize/user/{user_id}?count=4')
+            
+            if response.status_code == 200:
+                recommended_data = response.json()
+                
+                if recommended_data:
+                    recommended_ids = [item['ProductID'] for item in recommended_data]
+                    recommended_products = SanPham.query.filter(SanPham.ProductID.in_(recommended_ids)).all()
+                    
+                    # Sắp xếp sản phẩm theo thứ tự như trong API
+                    product_dict = {product.ProductID: product for product in recommended_products}
+                    recommended_products = [product_dict[id] for id in recommended_ids if id in product_dict]
+                else:
+                    # Fallback về sản phẩm phổ biến nếu không có đề xuất
+                    from services.recommend import RecommendationService
+                    recommendation_service = RecommendationService()
+                    popular_data = recommendation_service.get_popular_products(4)
+                    
+                    if popular_data:
+                        popular_ids = [item['ProductID'] for item in popular_data]
+                        recommended_products = SanPham.query.filter(SanPham.ProductID.in_(popular_ids)).all()
+                    else:
+                        recommended_products = SanPham.query.order_by(db.func.random()).limit(4).all()
+            else:
+                # API không khả dụng - fallback về sản phẩm phổ biến
+                from services.recommend import RecommendationService
+                recommendation_service = RecommendationService()
+                popular_data = recommendation_service.get_popular_products(4)
+                
+                if popular_data:
+                    popular_ids = [item['ProductID'] for item in popular_data]
+                    recommended_products = SanPham.query.filter(SanPham.ProductID.in_(popular_ids)).all()
+                else:
+                    recommended_products = SanPham.query.order_by(db.func.random()).limit(4).all()
+                    
+        except Exception as e:
+            print(f"Error getting personalized recommendations: {e}")
+            # Fallback về sản phẩm ngẫu nhiên
+            recommended_products = SanPham.query.order_by(db.func.random()).limit(4).all()
+    else:
+        # Người dùng chưa đăng nhập - hiển thị sản phẩm phổ biến
+        try:
+            from services.recommend import RecommendationService
+            recommendation_service = RecommendationService()
+            popular_data = recommendation_service.get_popular_products(4)
+            
+            if popular_data:
+                popular_ids = [item['ProductID'] for item in popular_data]
+                recommended_products = SanPham.query.filter(SanPham.ProductID.in_(popular_ids)).all()
+            else:
+                recommended_products = SanPham.query.order_by(db.func.random()).limit(4).all()
+                
+        except Exception as e:
+            print(f"Error getting popular products: {e}")
+            # Fallback về sản phẩm ngẫu nhiên
+            recommended_products = SanPham.query.order_by(db.func.random()).limit(4).all()
     
     return render_template('store.html',
                          products=products,
                          brands=brands,
                          brand_counts=brand_counts,
                          price_range=price_range,
+                         recommended_products=recommended_products,
                          current_filters={
                              'search': search_query,
                              'brand': brand_filter,
