@@ -87,13 +87,15 @@ As you complete tasks and references relevant files, update this file as our mem
 - [x] Xử lý lỗi đăng ký và hiển thị thông báo
 
 #### 3.2.6. Trang danh sách sản phẩm 
-- [ ] Tạo trang danh sách sản phẩm trong store.html để kế thừa từ base.html
-- [ ] Tạo chức năng lọc và tìm kiếm theo nhãn hàng, thời gian, giá thành
+- [x] Tạo trang danh sách sản phẩm trong store.html để kế thừa từ base.html
+- [x] Tạo chức năng lọc và tìm kiếm theo nhãn hàng, thời gian, giá thành
 
 ### 3.2.7. Chức năng thu thập tương tác người dùng
-- [ ] 
-- [ ]
-- [ ]
+- [ ] Xây dựng chức năng thu thập interaction gồm type cart, và view (cart khi người dùng đó bấm vào thêm giỏ hàng, view khi người dùng xem chi tiết sản phẩm đó)
+- [ ] Thêm chức năng vào trang product.html
+
+### 3.2.8 Chỉnh sửa frontend
+- [ ] Đổi lại web sử dụng hai màu chính (BFECFF và CDC1FF) thay vì màu đen và đỏ như hiện tại
 
 
 

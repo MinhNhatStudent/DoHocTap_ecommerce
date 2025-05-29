@@ -447,37 +447,82 @@ def inject_user():
 @view_bp.route('/store')
 def store():
     """
-    Trang cửa hàng hiển thị tất cả sản phẩm
+    Trang cửa hàng với chức năng lọc sản phẩm theo thương hiệu, giá và thời gian
     """
+    # Lấy các tham số lọc từ query string
     search_query = request.args.get('search', '')
+    brand_filter = request.args.get('brand', '')
+    min_price = request.args.get('min_price', type=float)
+    max_price = request.args.get('max_price', type=float)
+    sort_by = request.args.get('sort', 'newest')  # newest, price_asc, price_desc, name
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 12, type=int)
     
-    # Nếu có từ khóa tìm kiếm
+    # Bắt đầu với query cơ bản
+    query = SanPham.query
+    
+    # Áp dụng lọc tìm kiếm
     if search_query:
-        products = SanPham.query.filter(SanPham.Ten.like(f'%{search_query}%')).all()
-    else:
-        products = SanPham.query.all()      # Tạm thời sử dụng trực tiếp class RecommendationService để lấy sản phẩm phổ biến
-    try:
-        from services.recommend import RecommendationService
-        recommendation_service = RecommendationService()
-        
-        # Gọi trực tiếp phương thức của service
-        popular_data = recommendation_service.get_popular_products(8)
-        
-        if popular_data:
-            # Lấy các product từ database dựa trên ID
-            popular_ids = [item['ProductID'] for item in popular_data]
-            popular_products = SanPham.query.filter(SanPham.ProductID.in_(popular_ids)).all()
-            
-            # Sắp xếp sản phẩm theo thứ tự như trong API
-            product_dict = {product.ProductID: product for product in popular_products}
-            popular_products = [product_dict[id] for id in popular_ids if id in product_dict]
-        else:
-            popular_products = SanPham.query.order_by(db.func.random()).limit(4).all()
-    except Exception as e:
-        print(f"Error getting popular products: {e}")
-        popular_products = SanPham.query.order_by(db.func.random()).limit(4).all()
+        query = query.filter(SanPham.Ten.ilike(f'%{search_query}%'))
     
-    return render_template('store.html', products=products, popular_products=popular_products)
+    # Áp dụng lọc theo thương hiệu
+    if brand_filter:
+        query = query.filter(SanPham.NhanHang.ilike(f'%{brand_filter}%'))
+    
+    # Áp dụng lọc theo giá
+    if min_price is not None:
+        query = query.filter(SanPham.Gia >= min_price)
+    if max_price is not None:
+        query = query.filter(SanPham.Gia <= max_price)
+    
+    # Áp dụng sắp xếp
+    if sort_by == 'newest':
+        query = query.order_by(SanPham.ProductID.desc())
+    elif sort_by == 'price_asc':
+        query = query.order_by(SanPham.Gia.asc())
+    elif sort_by == 'price_desc':
+        query = query.order_by(SanPham.Gia.desc())
+    elif sort_by == 'name':
+        query = query.order_by(SanPham.Ten.asc())
+    else:
+        query = query.order_by(SanPham.ProductID.desc())
+    
+    # Phân trang
+    products = query.paginate(
+        page=page, 
+        per_page=per_page, 
+        error_out=False
+    )
+    
+    # Lấy danh sách các thương hiệu để hiển thị trong filter
+    brands = db.session.query(SanPham.NhanHang).distinct().filter(SanPham.NhanHang.isnot(None)).all()
+    brands = [brand[0] for brand in brands if brand[0]]
+    
+    # Lấy khoảng giá để hiển thị price slider
+    price_range = db.session.query(
+        db.func.min(SanPham.Gia).label('min_price'),
+        db.func.max(SanPham.Gia).label('max_price')
+    ).first()
+    
+    # Lấy số lượng sản phẩm theo từng thương hiệu
+    brand_counts = {}
+    for brand in brands:
+        count = SanPham.query.filter(SanPham.NhanHang.ilike(f'%{brand}%')).count()
+        brand_counts[brand] = count
+    
+    return render_template('store.html',
+                         products=products,
+                         brands=brands,
+                         brand_counts=brand_counts,
+                         price_range=price_range,
+                         current_filters={
+                             'search': search_query,
+                             'brand': brand_filter,
+                             'min_price': min_price,
+                             'max_price': max_price,
+                             'sort': sort_by,
+                             'per_page': per_page
+                         })
 
 @view_bp.route('/api/cart/<int:cart_id>', methods=['PUT'])
 def update_cart_item(cart_id):
