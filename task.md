@@ -68,11 +68,11 @@ As you complete tasks and references relevant files, update this file as our mem
 - [x] Tạo chức năng thêm sản phẩm vào giỏ hàng
 
 #### 3.2.3. Trang giỏ hàng
-- [ ] Chỉnh sửa cart.html để kế thừa từ base.html
-- [ ] Tạo route hiển thị giỏ hàng của người dùng
-- [ ] Tạo chức năng cập nhật số lượng sản phẩm trong giỏ hàng
-- [ ] Tạo chức năng xóa sản phẩm khỏi giỏ hàng
-- [ ] Hiển thị sản phẩm đề xuất dựa trên giỏ hàng
+- [x] Chỉnh sửa cart.html để kế thừa từ base.html
+- [x] Tạo route hiển thị giỏ hàng của người dùng
+- [x] Tạo chức năng cập nhật số lượng sản phẩm trong giỏ hàng
+- [x] Tạo chức năng xóa sản phẩm khỏi giỏ hàng
+- [x] Hiển thị sản phẩm đề xuất dựa trên giỏ hàng
 
 #### 3.2.4. Trang đăng nhập
 - [ ] Tạo form đăng nhập trong dangnhap.html

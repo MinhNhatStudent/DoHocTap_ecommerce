@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 import requests
 import json
 from models.product import SanPham
+from models.cart import Cart
 from models.database import db
 
 view_bp = Blueprint('view_bp', __name__)
@@ -127,34 +128,50 @@ def cart():
     user_id = 1
     
     try:
-        # Lấy sản phẩm trong giỏ hàng
-        response = requests.get(f'http://localhost:5000/cart/{user_id}')
-        cart_items_data = response.json()
+        # Lấy sản phẩm trong giỏ hàng trực tiếp từ database
+        from models.cart import Cart
+        cart_items_raw = Cart.query.filter_by(UserID=user_id).all()
         
         # Lấy chi tiết sản phẩm trong giỏ
         cart_items = []
         total = 0
         
-        for item in cart_items_data:
-            product = SanPham.query.get(item['product_id'])
+        for item in cart_items_raw:
+            product = SanPham.query.get(item.ProductID)
             if product:
-                item_total = float(product.Gia) * item['quantity']
+                item_total = float(product.Gia) * item.SoLuong
                 cart_items.append({
-                    'cart_id': item['cart_id'],
-                    'product_id': product.ProductID,
-                    'product': product,
-                    'quantity': item['quantity'],
+                    'CartID': item.CartID,
+                    'ProductID': product.ProductID,
+                    'Ten': product.Ten,
+                    'NhanHang': product.NhanHang,
+                    'Gia': float(product.Gia),
+                    'SoLuong': item.SoLuong,
+                    'HinhAnh': product.HinhAnh,
                     'item_total': item_total
                 })
                 total += item_total
         
         # Lấy sản phẩm đề xuất dựa trên giỏ hàng
         try:
-            recommend_response = requests.get(f'http://localhost:5000/recommend_bp/user/{user_id}')
-            recommended_data = recommend_response.json()
-            recommended_ids = [item['ProductID'] for item in recommended_data['recommended_products']]
-            recommended_products = SanPham.query.filter(SanPham.ProductID.in_(recommended_ids)).all()
-        except:
+            # Lấy sản phẩm đề xuất cho người dùng
+            from services.recommend import RecommendationService
+            recommendation_service = RecommendationService()
+            
+            # Lấy sản phẩm phổ biến làm đề xuất
+            recommended_data = recommendation_service.get_popular_products(4)
+            
+            if recommended_data:
+                recommended_ids = [item['ProductID'] for item in recommended_data]
+                recommended_products = SanPham.query.filter(SanPham.ProductID.in_(recommended_ids)).all()
+                
+                # Sắp xếp sản phẩm theo thứ tự như trong API
+                product_dict = {product.ProductID: product for product in recommended_products}
+                recommended_products = [product_dict[id] for id in recommended_ids if id in product_dict]
+            else:
+                recommended_products = SanPham.query.order_by(db.func.random()).limit(4).all()
+        except Exception as e:
+            print(f"Error getting recommendations: {e}")
             recommended_products = SanPham.query.order_by(db.func.random()).limit(4).all()
         
         return render_template(
@@ -282,3 +299,78 @@ def store():
         popular_products = SanPham.query.order_by(db.func.random()).limit(4).all()
     
     return render_template('store.html', products=products, popular_products=popular_products)
+
+@view_bp.route('/api/cart/<int:cart_id>', methods=['PUT'])
+def update_cart_item(cart_id):
+    """
+    API để cập nhật số lượng sản phẩm trong giỏ hàng (AJAX)
+    """
+    try:
+        from models.cart import Cart
+        
+        data = request.get_json()
+        quantity = data.get('SoLuong', 1)
+        
+        cart_item = Cart.query.get(cart_id)
+        if not cart_item:
+            return {'message': 'Sản phẩm trong giỏ hàng không tồn tại!'}, 404
+        
+        cart_item.SoLuong = quantity
+        db.session.commit()
+        
+        return {'message': 'Số lượng sản phẩm đã được cập nhật thành công!'}
+    except Exception as e:
+        return {'message': f'Có lỗi xảy ra: {str(e)}'}, 500
+
+@view_bp.route('/api/cart/<int:cart_id>', methods=['DELETE'])
+def remove_cart_item(cart_id):
+    """
+    API để xóa sản phẩm khỏi giỏ hàng (AJAX)
+    """
+    try:
+        from models.cart import Cart
+        
+        cart_item = Cart.query.get(cart_id)
+        if not cart_item:
+            return {'message': 'Sản phẩm trong giỏ hàng không tồn tại!'}, 404
+        
+        db.session.delete(cart_item)
+        db.session.commit()
+        
+        return {'message': 'Sản phẩm đã được xóa khỏi giỏ hàng!'}
+    except Exception as e:
+        return {'message': f'Có lỗi xảy ra: {str(e)}'}, 500
+
+@view_bp.route('/api/cart/', methods=['POST'])
+def add_to_cart_ajax():
+    """
+    API để thêm sản phẩm vào giỏ hàng (AJAX)
+    """
+    try:
+        from models.cart import Cart
+        
+        data = request.get_json()
+        user_id = data.get('UserID', 1)  # Default to user 1 for demo
+        product_id = data.get('ProductID')
+        quantity = data.get('SoLuong', 1)
+        
+        # Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+        existing_item = Cart.query.filter_by(UserID=user_id, ProductID=product_id).first()
+        
+        if existing_item:
+            # Nếu đã có, tăng số lượng
+            existing_item.SoLuong += quantity
+        else:
+            # Nếu chưa có, tạo mới
+            new_cart_item = Cart(
+                UserID=user_id,
+                ProductID=product_id,
+                SoLuong=quantity
+            )
+            db.session.add(new_cart_item)
+        
+        db.session.commit()
+        
+        return {'message': 'Sản phẩm đã được thêm vào giỏ hàng!'}
+    except Exception as e:
+        return {'message': f'Có lỗi xảy ra: {str(e)}'}, 500
