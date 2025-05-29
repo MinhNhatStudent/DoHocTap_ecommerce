@@ -95,13 +95,13 @@ Hệ thống User Profiling được thiết kế để theo dõi, phân tích v
 
 
 ## Các file cần lưu ý hiểu
-**view_routes.py**: Nơi gọi API và xử lý dữ liệu, tải dữ liệu cho từng trang, bảo đảm các chức năng recommend
-**product_vectorize.py**: API, Đây là đầu ra của backend để gộp các quy trình xử lý đề xuất thành 1
+- **view_routes.py**: Nơi gọi API và xử lý dữ liệu, tải dữ liệu cho từng trang, bảo đảm các chức năng recommend
+- **product_vectorize.py**: API, Đây là đầu ra của backend để gộp các quy trình xử lý đề xuất thành 1
 
-**recommend.py**: Nơi xử lý logic việc tính độ tương đồng và đề xuất thành danh sách sản phẩm
-**preprocess.py**: Nơi xử lý dữ liệu trước khi nhúng
-**embed_service.py**: Nơi nhúng dữ liệu
-**evaluation.py**: Nơi đánh giá dữ liệu 
+- **recommend.py**: Nơi xử lý logic việc tính độ tương đồng và đề xuất thành danh sách sản phẩm
+- **preprocess.py**: Nơi xử lý dữ liệu trước khi nhúng
+- **embed_service.py**: Nơi nhúng dữ liệu
+- **evaluation.py**: Nơi đánh giá dữ liệu 
 
 ## Cách dữ liệu di chuyển
 
